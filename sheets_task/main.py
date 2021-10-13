@@ -13,13 +13,6 @@ spreadsheet_id = '1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY'
 def f3_sheets_handler(request):
     global service
 
-    logger.info(f"{request.headers}")
-    logger.info(f"{request.form}")
-    logger.info(f"{request.data}")
-    logger.info(f"{request.path}")
-    logger.info(f"{request.url}")
-    logger.info(f"{request.json}")
-
     done = False
     retry_count = 0
     body = request.get_json().get("body", {})
