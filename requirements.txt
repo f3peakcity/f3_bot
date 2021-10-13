@@ -1,0 +1,8 @@
+slack_bolt
+sqlalchemy>=1.4.25
+sqlalchemy-bigquery
+google-cloud-bigquery-storage
+google-api-python-client
+google-cloud-storage
+pyarrow
+flask

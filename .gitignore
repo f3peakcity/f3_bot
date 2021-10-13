@@ -1,0 +1,6 @@
+.secret
+.env
+.env.yaml
+.idea
+__pycache__
+*.pyc
