@@ -1,13 +1,9 @@
-import datetime
 import os
-import uuid
 import logging
 
-from googleapiclient.errors import HttpError
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
-from googleapiclient import discovery
 
 import db
 import model
@@ -17,11 +13,19 @@ logging.basicConfig(level=logging.INFO)
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
-    # process_before_response=True,
+    process_before_response=True,
 )
 
-service = discovery.build('sheets', 'v4')
-spreadsheet_id = '1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY'
+
+from google.cloud import tasks_v2
+import datetime
+import json
+client = tasks_v2.CloudTasksClient()
+project = 'f3-carpex'
+queue = 'sheets-append'
+location = 'us-east1'
+url = 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler'
+parent = client.queue_path(project, location, queue)
 
 
 @app.command("/backblast")
@@ -242,7 +246,6 @@ def handle_backblast_submit(ack, body, logger):
         return
 
     backblast = model.Backblast(
-        id=uuid.uuid4().hex,
         store_date=datetime.datetime.now(),
         date=date,
         ao_id=ao_id,
@@ -266,32 +269,36 @@ def handle_backblast_submit(ack, body, logger):
         logger.error(f"Error storing /backblast data to BigQuery: {e}")
 
     try:
-        body = {
-            "values": backblast.to_rows()
+        # Also, create a cloud task
+        payload = {
+            "body": {
+                "values": backblast.to_rows()
+            }
         }
-        done = False
-        retry_count = 0
-        while not done and retry_count < 3:
-            retry_count += 1
-            try:
-                service.spreadsheets().values().append(
-                    spreadsheetId=spreadsheet_id,
-                    range="__RAW",
-                    body=body,
-                    valueInputOption="RAW"
-                ).execute()
-                done = True
-            except (ConnectionError, HttpError):
-                service = discovery.build('sheets', 'v4', credentials=None)
+        payload = json.dumps(payload)
+        converted_payload = payload.encode()
+        task = {
+            "http_request": {
+                "http_method": tasks_v2.HttpMethod.POST,
+                "url": url,
+                "headers": {"Content-type": "application/json"},
+                "body": converted_payload
+            },
+            "name": client.task_path(project, location, queue, backblast.id)
+        }
+        response = client.create_task(request={"parent": parent, "task": task})
+        logger.info(f"Created task {response.name}")
     except Exception as e:
         logger.error(f"Error storing /backblast data to Sheets: {e}")
 
 
 handler = SlackRequestHandler(app)
+
+
+def slackbot(request):
+    return handler.handle(request)
+
+
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
 
-
-# Cloud Function
-def handle_request(request):
-    return handler.handle(request)

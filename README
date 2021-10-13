@@ -1,11 +1,7 @@
-Deploy:
+Relevant APIs need to be enabled
+  - app engine function (https://console.developers.google.com/appengine)
+  - cloud task queues (`gcloud tasks queues create sheets-append`
 
-```
-gcloud functions deploy handle_request --region=us-east1  --allow-unauthenticated --trigger-http --runtime python39 --env-vars-file .env.yaml
-```
 
-.env.yaml example:
-```
-SLACK_BOT_TOKEN: xoxb-<>
-SLACK_SIGNING_SECRET: <>
-```
+OPPORTUNITIES TO EXCEL:
+ - add workspace column to output

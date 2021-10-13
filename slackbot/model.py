@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from sqlalchemy import Column, INTEGER, String, ARRAY, DATE, DATETIME
 from sqlalchemy.orm import declarative_base
@@ -11,8 +12,8 @@ Base = declarative_base()
 class Backblast(Base):
     __tablename__ = 'backblast'
 
-    def __init__(self, id, store_date, date, q, q_id, ao, ao_id, summary, pax, pax_ids, fngs, fng_ids, fngs_raw):
-        self.id = id
+    def __init__(self, store_date, date, q, q_id, ao, ao_id, summary, pax, pax_ids, fngs, fng_ids, fngs_raw):
+        self.id = uuid.uuid4().hex
         self.store_date = store_date
         self.date = date
         self.q = q

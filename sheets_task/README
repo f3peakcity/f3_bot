@@ -1,0 +1,3 @@
+```
+gcloud functions deploy f3-sheets-handler --entry-point f3_sheets_handler --region=us-east1  --allow-unauthenticated --trigger-http --runtime python39
+```
