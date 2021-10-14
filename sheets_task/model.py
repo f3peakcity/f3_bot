@@ -90,7 +90,6 @@ class Backblast(Base):
         return rows
 
 
-
 def init_db():
     engine = db.get_engine()
     Base.metadata.create_all(engine)

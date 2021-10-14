@@ -1,12 +1,13 @@
+import datetime
+import json
 import os
 import logging
+import uuid
 
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
-
-import db
-import model
+from google.cloud import tasks_v2
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,9 +18,6 @@ app = App(
 )
 
 
-from google.cloud import tasks_v2
-import datetime
-import json
 client = tasks_v2.CloudTasksClient()
 project = 'f3-carpex'
 queue = 'sheets-append'
@@ -206,7 +204,6 @@ def handle_q_select_interactive(ack, body, logger):
 
 @app.view("backblast_modal")
 def handle_backblast_submit(ack, body, logger):
-    global service
     ack()
     try:
         date = "1970-01-01"
@@ -244,36 +241,24 @@ def handle_backblast_submit(ack, body, logger):
     except Exception as e:
         logger.error(f"Error parsing /backblast data: {e}")
         return
-
-    backblast = model.Backblast(
-        store_date=datetime.datetime.now(),
-        date=date,
-        ao_id=ao_id,
-        ao=ao,
-        q_id=q_id,
-        q=q,
-        pax_ids=pax_ids,
-        pax=pax,
-        summary=summary,
-        fng_ids=fng_ids,
-        fngs=fngs,
-        fngs_raw=fngs_raw
-    )
-
-    try:
-        session = db.get_session()
-
-        session.add(backblast)
-        session.commit()
-    except Exception as e:
-        logger.error(f"Error storing /backblast data to BigQuery: {e}")
+    
+    backblast_data = {
+        "date": date,
+        "ao_id": ao_id,
+        "ao": ao,
+        "q_id": q_id,
+        "q": q,
+        "pax_ids": pax_ids,
+        "pax": pax,
+        "summary": summary,
+        "fng_ids": fng_ids,
+        "fngs": fngs,
+        "fngs_raw": fngs_raw
+    }
 
     try:
-        # Also, create a cloud task
         payload = {
-            "body": {
-                "values": backblast.to_rows()
-            }
+            "body": backblast_data
         }
         payload = json.dumps(payload)
         converted_payload = payload.encode()
@@ -284,7 +269,7 @@ def handle_backblast_submit(ack, body, logger):
                 "headers": {"Content-type": "application/json"},
                 "body": converted_payload
             },
-            "name": client.task_path(project, location, queue, backblast.id)
+            "name": client.task_path(project, location, queue, uuid.uuid4().hex)
         }
         response = client.create_task(request={"parent": parent, "task": task})
         logger.info(f"Created task {response.name}")
