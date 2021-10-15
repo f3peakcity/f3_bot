@@ -77,7 +77,9 @@ def open_backblast_form(ack, client, command, logger):
                                     "text": "Select a AO by channel",
                                     "emoji": True
                                 },
-                                "action_id": "ao-select"
+                                "action_id": "ao-select",
+                                "initial_channel": channel,
+                                "optional": False
                             },
                             {
                                 "type": "users_select",
@@ -184,6 +186,10 @@ def _get_names_from_id_list(id_list):
     return names
 
 
+def get_worked_phrase(summary):
+    return "got pushed to their max"
+
+
 @app.action("date-select")
 def handle_date_interactive(ack, body, logger):
     ack()
@@ -222,9 +228,13 @@ def handle_backblast_submit(ack, body, logger):
             if "date-select" in val:
                 date = val["date-select"]["selected_date"]
             if "ao-select" in val:
-                ao_id = val["ao-select"]["selected_channel"]
-                ao_obj = app.client.conversations_info(channel=ao_id)
-                ao = ao_obj.get("channel", {}).get("name", "")
+                ao_id = val["ao-select"].get("selected_channel", "")
+                try:
+                    ao_obj = app.client.conversations_info(channel=ao_id)
+                    ao = ao_obj.get("channel", {}).get("name", "")
+                except Exception as e:
+                    logger.error(f"Error getting channel info for channel {ao_id}")
+                    ao = ""
             if "q-select" in val:
                 q_id = val["q-select"]["selected_user"]
                 q = _get_name_from_id(q_id)
@@ -275,6 +285,30 @@ def handle_backblast_submit(ack, body, logger):
         logger.info(f"Created task {response.name}")
     except Exception as e:
         logger.error(f"Error storing /backblast data to Sheets: {e}")
+
+    try:
+        all_pax = {q_id} | set(fng_ids) | set(pax_ids)
+        all_pax_mention = ["<@" + pax + ">" for pax in all_pax]
+        all_pax_str = ", ".join(all_pax_mention)
+        n_pax = len(all_pax)
+
+        worked_phrase = get_worked_phrase(summary)
+
+        # Post in the channel(s)
+
+        # 1st F ID: C8LR0QG5V
+        backblast_bot_test_channel = "C02HZNS9GHY"
+        # ao_id: in message
+        message = f"{n_pax} {worked_phrase} at {ao}."
+        if summary:
+            message += f"\n{summary}"
+        message += f"\n{all_pax_str}"
+        app.client.chat_postMessage(
+            channel=backblast_bot_test_channel,
+            text=f"{n_pax} {worked_phrase} at {ao}.\n{summary}\n{all_pax_str}"
+        )
+    except Exception as e:
+        logger.error(f"Error posting message to channel: {e}")
 
 
 handler = SlackRequestHandler(app)
