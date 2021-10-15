@@ -299,13 +299,16 @@ def handle_backblast_submit(ack, body, logger):
         # 1st F ID: C8LR0QG5V
         backblast_bot_test_channel = "C02HZNS9GHY"
         # ao_id: in message
-        message = f"{n_pax} {worked_phrase} at {ao}."
-        if summary:
+        message = f"{n_pax} {worked_phrase}"
+        if ao_id is not None and ao_id != "":
+            message += f" at <#{ao_id}>"
+        message += "."
+        if summary is not None and summary != "":
             message += f"\n{summary}"
         message += f"\n{all_pax_str}"
         app.client.chat_postMessage(
             channel=backblast_bot_test_channel,
-            text=f"{n_pax} {worked_phrase} at {ao}.\n{summary}\n{all_pax_str}"
+            text=message
         )
     except Exception as e:
         logger.error(f"Error posting message to channel: {e}")
