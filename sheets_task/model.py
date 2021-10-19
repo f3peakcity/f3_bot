@@ -34,8 +34,8 @@ class Backblast(Base):
         if self.fng_ids is None:
             self.fng_ids = []
 
-        self.all_pax = [x for x in ({q_id} | set(pax) | set(fngs))]  # convert to list to support indexing
-        self.n_pax = len(self.all_pax)
+        self.all_pax_names = [x for x in ({q} | set(pax) | set(fngs))]  # convert to list to support indexing
+        self.n_pax = len(({q_id} | set(pax_ids) | set(fng_ids)))
         self.n_fngs = len(self.fngs)
         self.fngs_raw = fngs_raw
 
@@ -72,16 +72,16 @@ class Backblast(Base):
             date = "_unknown_"
         for i in range(n_rows):
             row = [
-                self.id,
-                store_date,
                 date,
                 self.q,
                 self.ao,
                 self.n_pax,
-                self.all_pax[i] if i < len(self.all_pax) else "",
+                self.all_pax_names[i] if i < len(self.all_pax_names) else "",
                 self.n_fngs,
                 self.fngs[i] if i < len(self.fngs) else "",
-                self.fngs_raw
+                self.fngs_raw,
+                self.id,
+                store_date
             ]
             rows.append(row)
         return rows
