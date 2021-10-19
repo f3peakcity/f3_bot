@@ -55,4 +55,4 @@ jobs:
         runtime: python39
         region: us-east1
         source_dir: ./slackbot/
-        env_vars_file: .env.yaml
+        env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
