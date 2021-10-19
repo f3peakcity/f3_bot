@@ -22,12 +22,13 @@ jobs:
       with:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: ${{ secrets.GCP_PROJECT }}
+        export_default_credentials: true
 
     - name: Deploy Queue Handler
       uses: google-github-actions/deploy-cloud-functions@main
       with:
         name: f3-sheets-handler
-        entrypoint: f3_sheets_handler
+        entry_point: f3_sheets_handler
         runtime: python39
         region: us-east1
         source_dir: ./sheets_task/
@@ -45,6 +46,7 @@ jobs:
       with:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: ${{ secrets.GCP_PROJECT }}
+        export_default_credentials: true
 
     - name: Deploy Slackbot
       uses: google-github-actions/deploy-cloud-functions@main
