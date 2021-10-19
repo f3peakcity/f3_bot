@@ -1,0 +1,56 @@
+name: Deploy slackbot to GCP
+
+on:
+  push:
+    branches:
+    - main
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+
+jobs:
+  deploy-queue-handler:
+    name: Deploy Queue Handler
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT }}
+
+    - name: Deploy Queue Handler
+      uses: google-github-actions/deploy-cloud-functions@main
+      with:
+        name: f3-sheets-handler
+        entrypoint: f3_sheets_handler
+        runtime: python39
+        region: us-east1
+        source_dir: ./sheets_task/
+
+  deploy-slackbot:
+    name: Deploy Slackbot
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT }}
+
+    - name: Deploy Slackbot
+      uses: google-github-actions/deploy-cloud-functions@main
+      with:
+        name: slackbot
+        runtime: python39
+        region: us-east1
+        source_dir: ./slackbot/
+        env_vars_file: ./slackbot/.env.yaml
