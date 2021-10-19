@@ -79,7 +79,6 @@ def open_backblast_form(ack, client, command, logger):
                                 },
                                 "action_id": "ao-select",
                                 "initial_channel": channel,
-                                "optional": False
                             },
                             {
                                 "type": "users_select",
@@ -288,10 +287,11 @@ def handle_backblast_submit(ack, body, logger):
 
     try:
         all_pax = {q_id} | set(fng_ids) | set(pax_ids)
-        all_pax_mention = ["<@" + pax + ">" for pax in all_pax]
-        all_pax_str = ", ".join(all_pax_mention)
         n_pax = len(all_pax)
 
+        all_pax_no_q = all_pax - {q_id}
+        all_pax_str = ", ".join([f"<@{pax}>" for pax in all_pax_no_q])
+        all_pax_str += f" (<@{q_id}> Q)"
         worked_phrase = get_worked_phrase(summary)
 
         # Post in the channel(s)

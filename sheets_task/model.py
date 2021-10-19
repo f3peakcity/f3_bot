@@ -33,7 +33,9 @@ class Backblast(Base):
             self.fng_ids = []
         if self.fng_ids is None:
             self.fng_ids = []
-        self.n_pax = len(self.pax)
+
+        self.all_pax = [x for x in ({q_id} | set(pax) | set(fngs))]  # convert to list to support indexing
+        self.n_pax = len(self.all_pax)
         self.n_fngs = len(self.fngs)
         self.fngs_raw = fngs_raw
 
@@ -54,7 +56,7 @@ class Backblast(Base):
     fngs_raw = Column(String)
 
     def to_rows(self):
-        n_rows = max(1, self.n_pax, self.n_fngs)
+        n_rows = max(1, self.n_pax)
         rows = []
         if isinstance(self.store_date, datetime.datetime):
             store_date = self.store_date.isoformat()
@@ -74,16 +76,11 @@ class Backblast(Base):
                 store_date,
                 date,
                 self.q,
-                self.q_id,
                 self.ao,
-                self.ao_id,
-                self.summary,
                 self.n_pax,
-                self.pax[i] if i < len(self.pax) else "",
-                self.pax_ids[i] if i < len(self.pax_ids) else "",
+                self.all_pax[i] if i < len(self.all_pax) else "",
                 self.n_fngs,
                 self.fngs[i] if i < len(self.fngs) else "",
-                self.fng_ids[i] if i < len(self.fng_ids) else "",
                 self.fngs_raw
             ]
             rows.append(row)
