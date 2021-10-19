@@ -33,7 +33,7 @@ def f3_sheets_handler(request):
         summary=body.get("summary"),
         fng_ids=body.get("fng_ids"),
         fngs=body.get("fngs"),
-        fngs_raw=body.get("fngs_ra")
+        fngs_raw=body.get("fngs_raw")
     )
 
     try:
