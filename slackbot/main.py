@@ -370,21 +370,21 @@ def _parse_backblast_body(body, logger):
                         n_visiting_pax = 10
                     else:
                         n_visiting_pax = 0
-            backblast_data = {
-                "date": date,
-                "ao_id": ao_id,
-                "ao": ao,
-                "q_id": q_id,
-                "q": q,
-                "pax_ids": pax_ids,
-                "pax": pax,
-                "summary": summary,
-                "fng_ids": fng_ids,
-                "fngs": fngs,
-                "fngs_raw": fngs_raw,
-                "n_visiting_pax": n_visiting_pax
-            }
-            return backblast_data
+        backblast_data = {
+            "date": date,
+            "ao_id": ao_id,
+            "ao": ao,
+            "q_id": q_id,
+            "q": q,
+            "pax_ids": pax_ids,
+            "pax": pax,
+            "summary": summary,
+            "fng_ids": fng_ids,
+            "fngs": fngs,
+            "fngs_raw": fngs_raw,
+            "n_visiting_pax": n_visiting_pax
+        }
+        return backblast_data
     except Exception as e:
         logger.error(f"Error parsing /backblast data: {e}")
         return
