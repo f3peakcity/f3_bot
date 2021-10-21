@@ -9,14 +9,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 from google.cloud import tasks_v2
 
-logging.basicConfig(level=logging.INFO)
-
-app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
-    process_before_response=True,
-)
-
+import util
 
 client = tasks_v2.CloudTasksClient()
 project = 'f3-carpex'
@@ -24,6 +17,15 @@ queue = 'sheets-append'
 location = 'us-east1'
 url = 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler'
 parent = client.queue_path(project, location, queue)
+
+
+logging.basicConfig(level=logging.INFO)
+
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
+    process_before_response=True,
+)
 
 
 @app.command("/backblast")
@@ -162,31 +164,119 @@ def open_backblast_form(ack, client, command, logger):
                         },
                         "optional": True
                     },
+                    {
+                        "type": "input",
+                        "element": {
+                            "type": "static_select",
+                            "placeholder": {
+                                "type": "plain_text",
+                                "text": "How many PAX from another region?"
+                            },
+                            "options": [
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "0",
+                                        "emoji": True
+                                    },
+                                    "value": "0"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "1",
+                                        "emoji": True
+                                    },
+                                    "value": "1"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "2",
+                                        "emoji": True
+                                    },
+                                    "value": "2"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "3",
+                                        "emoji": True
+                                    },
+                                    "value": "3"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "4",
+                                        "emoji": True
+                                    },
+                                    "value": "4"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "5",
+                                        "emoji": True
+                                    },
+                                    "value": "5"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "6",
+                                        "emoji": True
+                                    },
+                                    "value": "6"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "7",
+                                        "emoji": True
+                                    },
+                                    "value": "7"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "8",
+                                        "emoji": True
+                                    },
+                                    "value": "8"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "9",
+                                        "emoji": True
+                                    },
+                                    "value": "9"
+                                },
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "10+",
+                                        "emoji": True
+                                    },
+                                    "value": "10+"
+                                }
+                            ],
+                            "action_id": "visiting-pax"
+                        },
+                        "label": {
+                            "type": "plain_text",
+                            "text": "Visiting PAX",
+                            "emoji": True
+                        },
+                        "optional": True
+                    }
                 ]
             }
         )
 
     except Exception as e:
         logger.error(f"Error processing /backblast command: {e}")
-
-
-def _get_name_from_id(id_):
-    user = app.client.users_info(user=id_).get("user", {})
-    display_name = user.get("profile", {}).get("display_name", None)
-    real_name = user.get("profile", {}).get("real_name", None)
-    name = user.get("name", None)
-    return display_name or real_name or name or ""
-
-
-def _get_names_from_id_list(id_list):
-    names = []
-    for id_ in id_list:
-        names.append(_get_name_from_id(id_))
-    return names
-
-
-def get_worked_phrase(summary):
-    return "got pushed to their max"
 
 
 @app.action("date-select")
@@ -210,6 +300,29 @@ def handle_q_select_interactive(ack, body, logger):
 @app.view("backblast_modal")
 def handle_backblast_submit(ack, body, logger):
     ack()
+    backblast_data = _parse_backblast_body(body, logger)
+
+    _add_data_to_queue(backblast_data, logger)
+    message = util.build_message(backblast_data, logger)
+    if message is None:
+        return
+
+    # Post in the channel(s)
+    first_f_channel = "C8LR0QG5V"
+    backblast_bot_test_channel = "C02HZNS9GHY"
+    ao_channel = backblast_data["ao_id"]
+
+    for post_channel in [first_f_channel, ao_channel]:
+        try:
+            app.client.chat_postMessage(
+                channel=post_channel,
+                text=message
+            )
+        except Exception as e:
+            logger.error(f"Error posting message to channel: {e}")
+
+
+def _parse_backblast_body(body, logger):
     try:
         date = "1970-01-01"
         ao_id = ""
@@ -222,6 +335,7 @@ def handle_backblast_submit(ack, body, logger):
         fng_ids = []
         fngs = []
         fngs_raw = ""
+        n_visiting_pax = 0
         values = body.get("view", {}).get("state", {}).get("values")
         for val in values.values():
             if "date-select" in val:
@@ -247,24 +361,51 @@ def handle_backblast_submit(ack, body, logger):
                 fngs = _get_names_from_id_list(fng_ids)
             if "fngs-raw" in val:
                 fngs_raw = val["fngs-raw"]["value"]
+            if "visiting-pax" in val:
+                visiting_pax_str = val["visiting-pax"]["value"]
+                try:
+                    n_visiting_pax = int(visiting_pax_str)
+                except ValueError:
+                    if len(visiting_pax_str) > 0:
+                        n_visiting_pax = 10
+                    else:
+                        n_visiting_pax = 0
+            backblast_data = {
+                "date": date,
+                "ao_id": ao_id,
+                "ao": ao,
+                "q_id": q_id,
+                "q": q,
+                "pax_ids": pax_ids,
+                "pax": pax,
+                "summary": summary,
+                "fng_ids": fng_ids,
+                "fngs": fngs,
+                "fngs_raw": fngs_raw,
+                "n_visiting_pax": n_visiting_pax
+            }
+            return backblast_data
     except Exception as e:
         logger.error(f"Error parsing /backblast data: {e}")
         return
-    
-    backblast_data = {
-        "date": date,
-        "ao_id": ao_id,
-        "ao": ao,
-        "q_id": q_id,
-        "q": q,
-        "pax_ids": pax_ids,
-        "pax": pax,
-        "summary": summary,
-        "fng_ids": fng_ids,
-        "fngs": fngs,
-        "fngs_raw": fngs_raw
-    }
 
+
+def _get_name_from_id(id_):
+    user = app.client.users_info(user=id_).get("user", {})
+    display_name = user.get("profile", {}).get("display_name", None)
+    real_name = user.get("profile", {}).get("real_name", None)
+    name = user.get("name", None)
+    return display_name or real_name or name or ""
+
+
+def _get_names_from_id_list(id_list):
+    names = []
+    for id_ in id_list:
+        names.append(_get_name_from_id(id_))
+    return names
+
+
+def _add_data_to_queue(backblast_data, logger):
     try:
         payload = {
             "body": backblast_data
@@ -284,40 +425,6 @@ def handle_backblast_submit(ack, body, logger):
         logger.info(f"Created task {response.name}")
     except Exception as e:
         logger.error(f"Error storing /backblast data to Sheets: {e}")
-
-    try:
-        all_pax = {q_id} | set(fng_ids) | set(pax_ids)
-        n_pax = len(all_pax)
-
-        all_pax_no_q = all_pax - {q_id}
-        all_pax_str = ", ".join([f"<@{pax}>" for pax in all_pax_no_q])
-        all_pax_str += f" (<@{q_id}> Q)"
-        worked_phrase = get_worked_phrase(summary)
-
-        # Post in the channel(s)
-
-        first_f_channel = "C8LR0QG5V"
-        backblast_bot_test_channel = "C02HZNS9GHY"
-        ao_channel = ao_id
-
-        post_channels = [first_f_channel]
-
-        # ao_id: in message
-        message = f"{n_pax} {worked_phrase}"
-        if ao_id is not None and ao_id != "":
-            message += f" at <#{ao_id}>"
-        message += "."
-        if summary is not None and summary != "":
-            message += f"\n{summary}"
-        message += f"\n{all_pax_str}"
-
-        for post_channel in post_channels:
-            app.client.chat_postMessage(
-                channel=post_channel,
-                text=message
-            )
-    except Exception as e:
-        logger.error(f"Error posting message to channel: {e}")
 
 
 handler = SlackRequestHandler(app)
