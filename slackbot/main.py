@@ -424,7 +424,7 @@ def _add_data_to_queue(backblast_data, logger):
         response = client.create_task(request={"parent": parent, "task": task})
         logger.info(f"Created task {response.name}")
     except Exception as e:
-        logger.error(f"Error storing /backblast data to Sheets: {e}")
+        logger.error(f"Error creating task: {e}")
 
 
 handler = SlackRequestHandler(app)
