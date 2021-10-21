@@ -1,11 +1,16 @@
+import uuid
 import datetime
 
 import pytest
+from unittest import mock
 
 import model
 
+mock_uuid = uuid.UUID("a5b54c95d475477583e1c2a60cb6bdc7")
+
 @pytest.fixture
-def backblast():
+@mock.patch("model.uuid.uuid4", return_value=mock_uuid)
+def backblast(_):
     backblast = model.Backblast(
         store_date=datetime.datetime.now(),
         date="2021-10-20",

@@ -80,6 +80,12 @@ class Backblast(Base):
             date = self.date
         else:
             date = "_unknown_"
+
+        if self.fngs_raw is None or len(self.fngs_raw) == 0:
+            fngs_raw_str = "_"
+        else:
+            fngs_raw_str = self.fngs_raw
+
         for i in range(n_rows):
             row = [
                 date,
@@ -89,8 +95,8 @@ class Backblast(Base):
                 self.all_pax[i][1] if i < len(self.all_pax) else "",  # name
                 self.all_pax[i][0] if i < len(self.all_pax) else "",  # id
                 self.n_fngs,
-                self.fngs[i] if i < len(self.fngs) else "",
-                self.fngs_raw,
+                self.fngs[i] if i < len(self.fngs) else "_",
+                fngs_raw_str,
                 self.n_visiting_pax,
                 self.id,
                 store_date
