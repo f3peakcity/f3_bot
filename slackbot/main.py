@@ -362,7 +362,7 @@ def _parse_backblast_body(body, logger):
             if "fngs-raw" in val:
                 fngs_raw = val["fngs-raw"]["value"]
             if "visiting-pax" in val:
-                visiting_pax_str = val["visiting-pax"]["value"]
+                visiting_pax_str = val["visiting-pax"]["selected_option"]["value"]
                 try:
                     n_visiting_pax = int(visiting_pax_str)
                 except ValueError:
