@@ -312,7 +312,7 @@ def handle_backblast_submit(ack, body, logger):
     backblast_bot_test_channel = "C02HZNS9GHY"
     ao_channel = backblast_data["ao_id"]
 
-    for post_channel in [first_f_channel, ao_channel]:
+    for post_channel in [backblast_bot_test_channel]:  # [first_f_channel, ao_channel]:
         try:
             app.client.chat_postMessage(
                 channel=post_channel,
