@@ -5,13 +5,13 @@ def get_worked_phrase(summary):
 
 
 def build_message(backblast_data, logger):
-    q_id = backblast_data.get("q_id")
-    fng_ids = backblast_data.get("fng_ids")
-    pax_ids = backblast_data.get("pax_ids")
-    n_visiting_pax = backblast_data.get("n_visiting_pax")
-    summary = backblast_data.get("summary")
-    ao_id = backblast_data.get("ao_id")
-    fngs_raw = backblast_data.get("fngs_raw")
+    q_id = backblast_data.get("q_id", "")
+    fng_ids = backblast_data.get("fng_ids", [])
+    pax_ids = backblast_data.get("pax_ids", [])
+    n_visiting_pax = backblast_data.get("n_visiting_pax", 0)
+    summary = backblast_data.get("summary", "")
+    ao_id = backblast_data.get("ao_id", "")
+    fngs_raw = backblast_data.get("fngs_raw", "")
 
     try:
         all_pax = {q_id} | set(fng_ids) | set(pax_ids)
@@ -36,7 +36,7 @@ def build_message(backblast_data, logger):
         if len(fng_ids) > 0:
             fng_str = ", ".join([f"<@{pax}>" for pax in fng_ids])
             message += f"\nFNGs named today: {fng_str}"
-        if len(fngs_raw) > 0:
+        if fngs_raw is not None and len(fngs_raw) > 0:
             message += f"\nFNGs not yet in slack: {fngs_raw}"
         if n_visiting_pax > 0:
             message += f"\nJoined by {n_visiting_pax} from outside our region."

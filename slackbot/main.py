@@ -323,19 +323,19 @@ def handle_backblast_submit(ack, body, logger):
 
 
 def _parse_backblast_body(body, logger):
+    date = "1970-01-01"
+    ao_id = ""
+    ao = ""
+    q_id = ""
+    q = ""
+    pax_ids = []
+    pax = []
+    summary = ""
+    fng_ids = []
+    fngs = []
+    fngs_raw = ""
+    n_visiting_pax = 0
     try:
-        date = "1970-01-01"
-        ao_id = ""
-        ao = ""
-        q_id = ""
-        q = ""
-        pax_ids = []
-        pax = []
-        summary = ""
-        fng_ids = []
-        fngs = []
-        fngs_raw = ""
-        n_visiting_pax = 0
         values = body.get("view", {}).get("state", {}).get("values")
         for val in values.values():
             if "date-select" in val:
@@ -370,24 +370,24 @@ def _parse_backblast_body(body, logger):
                         n_visiting_pax = 10
                     else:
                         n_visiting_pax = 0
-        backblast_data = {
-            "date": date,
-            "ao_id": ao_id,
-            "ao": ao,
-            "q_id": q_id,
-            "q": q,
-            "pax_ids": pax_ids,
-            "pax": pax,
-            "summary": summary,
-            "fng_ids": fng_ids,
-            "fngs": fngs,
-            "fngs_raw": fngs_raw,
-            "n_visiting_pax": n_visiting_pax
-        }
-        return backblast_data
     except Exception as e:
         logger.error(f"Error parsing /backblast data: {e}")
-        return
+
+    backblast_data = {
+        "date": date,
+        "ao_id": ao_id,
+        "ao": ao,
+        "q_id": q_id,
+        "q": q,
+        "pax_ids": pax_ids,
+        "pax": pax,
+        "summary": summary,
+        "fng_ids": fng_ids,
+        "fngs": fngs,
+        "fngs_raw": fngs_raw,
+        "n_visiting_pax": n_visiting_pax
+    }
+    return backblast_data
 
 
 def _get_name_from_id(id_):
