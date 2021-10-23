@@ -336,9 +336,11 @@ def _parse_backblast_body(body, logger):
     fngs = []
     fngs_raw = ""
     n_visiting_pax = 0
-    try:
-        values = body.get("view", {}).get("state", {}).get("values")
-        for val in values.values():
+    submitter_id = ""
+    submitter = ""
+    values = body.get("view", {}).get("state", {}).get("values", {})
+    for val in values.values():
+        try:
             if "date-select" in val:
                 date = val["date-select"]["selected_date"]
             if "ao-select" in val:
@@ -371,8 +373,14 @@ def _parse_backblast_body(body, logger):
                         n_visiting_pax = 10
                     else:
                         n_visiting_pax = 0
+        except Exception as e:
+            logger.error(f"Error parsing /backblast data: {e}")
+    try:
+        submitter_id = body.get("user", {}).get("id")
+        if submitter_id is not None:
+            submitter = _get_name_from_id(submitter_id)
     except Exception as e:
-        logger.error(f"Error parsing /backblast data: {e}")
+        logger.error(f"Error getting submitter from /backblast data: {e}")
 
     backblast_data = {
         "date": date,
@@ -386,7 +394,9 @@ def _parse_backblast_body(body, logger):
         "fng_ids": fng_ids,
         "fngs": fngs,
         "fngs_raw": fngs_raw,
-        "n_visiting_pax": n_visiting_pax
+        "n_visiting_pax": n_visiting_pax,
+        "submitter_id": submitter_id,
+        "submitter": submitter
     }
     return backblast_data
 

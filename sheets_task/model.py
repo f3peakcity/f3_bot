@@ -12,7 +12,8 @@ Base = declarative_base()
 class Backblast(Base):
     __tablename__ = 'backblast'
 
-    def __init__(self, store_date, date, q, q_id, ao, ao_id, summary, pax, pax_ids, fngs, fng_ids, fngs_raw, n_visiting_pax):
+    def __init__(self, store_date, date, q, q_id, ao, ao_id, summary, pax, pax_ids, fngs, fng_ids, fngs_raw,
+                 n_visiting_pax, submitter_id, submitter):
         self.id = uuid.uuid4().hex
         self.store_date = store_date
         self.date = date
@@ -27,6 +28,9 @@ class Backblast(Base):
         self.fng_ids = fng_ids
         self.fngs_raw = fngs_raw
         self.n_visiting_pax = n_visiting_pax
+        self.submitter_id = submitter_id
+        self.submitter = submitter
+
         if self.pax is None:
             self.pax = []
         if self.pax_ids is None:
@@ -64,6 +68,8 @@ class Backblast(Base):
     fng_ids = Column(ARRAY(String))
     fngs_raw = Column(String)
     n_visiting_pax = Column(INTEGER)
+    submitter_id = Column(String)
+    submitter = Column(String)
 
     def to_rows(self):
         n_rows = max(1, self.n_pax)
@@ -98,6 +104,8 @@ class Backblast(Base):
                 self.fngs[i] if i < len(self.fngs) else "_",
                 fngs_raw_str,
                 self.n_visiting_pax,
+                self.submitter,
+                self.submitter_id,
                 self.id,
                 store_date
             ]

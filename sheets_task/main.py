@@ -4,8 +4,8 @@ import logging
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 
-import model
 import db
+import model
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,7 +34,9 @@ def f3_sheets_handler(request):
         fng_ids=body.get("fng_ids"),
         fngs=body.get("fngs"),
         fngs_raw=body.get("fngs_raw"),
-        n_visiting_pax=body.get("n_visiting_pax")
+        n_visiting_pax=body.get("n_visiting_pax"),
+        submitter_id=body.get("submitter_id"),
+        submitter=body.get("submitter")
     )
 
     try:
