@@ -1,13 +1,12 @@
 import datetime
 import json
-import os
 import logging
+import os
 import uuid
 
+from google.cloud import tasks_v2
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
-
-from google.cloud import tasks_v2
 
 import util
 
@@ -80,7 +79,8 @@ def open_backblast_form(ack, client, command, logger):
                                     "emoji": True
                                 },
                                 "action_id": "ao-select",
-                                "initial_channel": channel,
+                                # do not set an initial_channel since too many people left it as default (1st f)
+                                # "initial_channel": channel,
                             },
                             {
                                 "type": "users_select",
