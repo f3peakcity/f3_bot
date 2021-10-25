@@ -66,7 +66,7 @@ def open_backblast_form(ack, client, command, logger):
                                 "initial_date": default_date,
                                 "placeholder": {
                                     "type": "plain_text",
-                                    "text": "Select a date",
+                                    "text": "Select date",
                                     "emoji": True
                                 },
                                 "action_id": "date-select"
@@ -75,7 +75,7 @@ def open_backblast_form(ack, client, command, logger):
                                 "type": "channels_select",
                                 "placeholder": {
                                     "type": "plain_text",
-                                    "text": "Select a AO by channel",
+                                    "text": "Select an AO by channel",
                                     "emoji": True
                                 },
                                 "action_id": "ao-select",
@@ -398,6 +398,7 @@ def _parse_backblast_body(body, logger):
         "submitter_id": submitter_id,
         "submitter": submitter
     }
+    logger.info(f"Built backblast object: \n{json.dumps(backblast_data, indent=2)}")
     return backblast_data
 
 
