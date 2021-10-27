@@ -303,7 +303,6 @@ def handle_q_select_interactive(ack, body, logger):
 @app.action("pax-select")
 def handle_pax_select_interactive(ack, body, logger):
     ack()
-    logger.info(json.dumps(body, indent=2))
 
     # Get the number of selected users
     actions = body.get("actions", [])
@@ -324,7 +323,6 @@ def handle_pax_select_interactive(ack, body, logger):
 
     # Build the view update:
     view = body.get("view", {})
-    print(view.keys())
     view = copy.deepcopy(view)
     view.pop("id")
     view.pop("team_id")
@@ -449,7 +447,7 @@ def _parse_backblast_body(body, logger):
         "submitter_id": submitter_id,
         "submitter": submitter
     }
-    logger.info(f"Built backblast object: \n{json.dumps(backblast_data, indent=2)}")
+    logger.debug(f"Built backblast object: \n{json.dumps(backblast_data, indent=2)}")
     return backblast_data
 
 
