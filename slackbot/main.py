@@ -364,7 +364,7 @@ def handle_backblast_submit(ack, body, logger):
             post_channels.add(first_f_channel)
 
         if not channel["is_member"]:
-            app.client.channels_join(name=ao_channel)
+            app.client.conversations_join(channel=ao_channel)
     except Exception as e:
         post_channels = {ao_channel, first_f_channel}
         logger.error(f"Error getting channel info: {e}")
