@@ -57,7 +57,7 @@ def open_backblast_form(ack, client, command, logger):
                     "text": "Cancel",
                     "emoji": True
                 },
-                # "private_metadata": "__",
+                "private_metadata": f'{{"initial_channel": {channel} }}',
                 # body of the view
                 "blocks": [
                     {
@@ -356,7 +356,18 @@ def handle_backblast_submit(ack, body, logger):
     first_f_channel = "C8LR0QG5V"
     backblast_bot_test_channel = "C02HZNS9GHY"
     ao_channel = backblast_data["ao_id"]
-    post_channels = {ao_channel, first_f_channel}
+    try:
+        channel = app.client.conversations_info(channel=ao_channel).get("channel", {})
+        ao_name = channel.get("name", "")
+        post_channels = {ao_channel}
+        if ao_name.startswith("ao"):
+            post_channels.add(first_f_channel)
+
+        if not channel["is_member"]:
+            app.client.channels_join(name=ao_channel)
+    except Exception as e:
+        post_channels = {ao_channel, first_f_channel}
+        logger.error(f"Error getting channel info: {e}")
 
     for post_channel in post_channels:
         try:
