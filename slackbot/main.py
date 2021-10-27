@@ -320,6 +320,7 @@ def handle_pax_select_interactive(ack, body, logger):
             elif block["type"] == "input":
                 if block["element"]["action_id"] == "pax-select":
                     block["label"]["text"] = f"Pax ({new_num} selected)"
+                    block["element"]["placeholder"]["text"] = f"{new_num} selected"
 
     # Build the view update:
     view = body.get("view", {})
