@@ -1,3 +1,4 @@
+import copy
 import datetime
 import json
 import logging
@@ -56,6 +57,7 @@ def open_backblast_form(ack, client, command, logger):
                     "text": "Cancel",
                     "emoji": True
                 },
+                # "private_metadata": "__",
                 # body of the view
                 "blocks": [
                     {
@@ -96,6 +98,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "dispatch_action": True,
                         "element": {
                             "type": "multi_users_select",
                             "placeholder": {
@@ -297,6 +300,49 @@ def handle_q_select_interactive(ack, body, logger):
     logger.debug(body)
 
 
+@app.action("pax-select")
+def handle_pax_select_interactive(ack, body, logger):
+    ack()
+    logger.info(json.dumps(body, indent=2))
+
+    # Get the number of selected users
+    actions = body.get("actions", [])
+    selected_users_cnt = 0
+    for action in actions:
+        if action.get("action_id") == "pax-select":
+            selected_users_cnt = len(action.get("selected_users", []))
+
+    def _update_pax_number(blocks, new_num):
+        for block in blocks:
+            # descend into action blocks
+            if block["type"] == "actions":
+                _update_pax_number(block["elements"], new_num)
+            elif block["type"] == "input":
+                if block["element"]["action_id"] == "pax-select":
+                    block["label"]["text"] = f"Pax ({new_num} selected)"
+
+    # Build the view update:
+    view = body.get("view", {})
+    print(view.keys())
+    view = copy.deepcopy(view)
+    view.pop("id")
+    view.pop("team_id")
+    view.pop("state")
+    view.pop("hash")
+    view.pop("previous_view_id")
+    view.pop("root_view_id")
+    view.pop("app_id")
+    view.pop("app_installed_team_id")
+    view.pop("bot_id")
+    _update_pax_number(view["blocks"], selected_users_cnt)
+
+    app.client.views_update(
+        view_id=body["view"]["id"],
+        hash=body["view"]["hash"],
+        view=view
+    )
+
+
 @app.view("backblast_modal")
 def handle_backblast_submit(ack, body, logger):
     ack()
@@ -365,7 +411,11 @@ def _parse_backblast_body(body, logger):
             if "fngs-raw" in val:
                 fngs_raw = val["fngs-raw"]["value"]
             if "visiting-pax" in val:
-                visiting_pax_str = val["visiting-pax"]["selected_option"]["value"]
+                visiting_pax = val["visiting-pax"]["selected_option"]
+                if visiting_pax is None:
+                    continue
+                else:
+                    visiting_pax_str = visiting_pax["value"]
                 try:
                     n_visiting_pax = int(visiting_pax_str)
                 except ValueError:

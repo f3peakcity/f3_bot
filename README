@@ -1,7 +1,11 @@
 Relevant APIs need to be enabled
   - app engine function (https://console.developers.google.com/appengine)
-  - cloud task queues (`gcloud tasks queues create sheets-append`
+  - cloud task queues (`gcloud tasks queues create sheets-append`)
 
 
 OPPORTUNITIES TO EXCEL:
  - add workspace column to output
+ - [DONE] add reporter column
+ - [DONE] add number of PAX selected to picker
+ - [DONE] add field for non-CARPEX PAX
+ - add a message showing totals for the day
