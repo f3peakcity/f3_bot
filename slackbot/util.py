@@ -20,6 +20,10 @@ def build_message(backblast_data, logger):
         if n_visiting_pax > 0:
             n_pax += n_visiting_pax
 
+        if len(fngs_raw) > 0:
+            n_fngs_raw = len(fngs_raw.split(","))
+            n_pax += n_fngs_raw
+
         all_pax_no_q = all_pax - {q_id}
         all_pax_str = ", ".join([f"<@{pax}>" for pax in all_pax_no_q])
         all_pax_str += f" (<@{q_id}> Q)"
