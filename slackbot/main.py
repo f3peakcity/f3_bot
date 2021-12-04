@@ -18,7 +18,6 @@ location = 'us-east1'
 url = 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler'
 parent = client.queue_path(project, location, queue)
 
-
 logging.basicConfig(level=logging.INFO)
 
 app = App(
@@ -26,6 +25,28 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
     process_before_response=True,
 )
+
+
+@app.command("/paxmate")
+def post_as_paxmate(ack, client, command, logger):
+    ack()
+    user = command.get("user_id")
+    channel = command.get("channel_id")
+    text = command.get("text")
+    if not text.startswith("say "):
+        logger.warning(f"unrecognized subcommand: {text}")
+        return
+
+    if not (user == "U8LBE9LTW" or user == "UFZR843T6"):
+        client.chat_postEphemeral(
+            channel=channel,
+            text="Sorry, only Banjo has this power."
+        )
+    else:
+        client.chat_postMessage(
+            channel=channel,
+            text=text
+        )
 
 
 @app.command("/backblast")
