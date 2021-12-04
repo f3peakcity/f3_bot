@@ -3,6 +3,7 @@ import logging
 
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
+from sqlalchemy_cockroachdb import run_transaction
 
 import db
 import model
@@ -45,6 +46,12 @@ def f3_sheets_handler(request):
         session.commit()
     except Exception as e:
         logger.error(f"Error storing /backblast data to BigQuery: {e}")
+
+    try:
+        Session = db.get_cockroach_sessionmaker()
+        run_transaction(Session, lambda s: s.add(backblast))
+    except Exception as e:
+        logger.error(f"Error storing /backblast data to CockroachDb: {e}")
 
     spreadsheet_request_body = {
         "values": backblast.to_rows()

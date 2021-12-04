@@ -6,3 +6,5 @@ sqlalchemy-bigquery
 google-cloud-bigquery-storage
 google-api-python-client
 pyarrow
+sqlalchemy-cockroachdb
+psycopg2-binary

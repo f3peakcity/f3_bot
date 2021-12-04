@@ -32,6 +32,7 @@ jobs:
         runtime: python39
         region: us-east1
         source_dir: ./sheets_task/
+        env_vars: ${{ secrets.SHEETS_HANDLER_ENV_VARS }}
 
   deploy-slackbot:
     name: Deploy Slackbot
