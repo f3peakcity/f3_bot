@@ -37,7 +37,8 @@ def post_as_paxmate(ack, client, command, logger):
     if not text.startswith("say "):
         client.chat_postEphemeral(
             channel=channel,
-            text="I don't understand that command. Try saying, /paxmate say I like Banjo."
+            text="I don't understand that command. Try saying, /paxmate say I like Banjo.",
+            user=user
         )
         logger.warning(f"unrecognized subcommand: {text}")
         return
@@ -52,7 +53,8 @@ def post_as_paxmate(ack, client, command, logger):
     else:
         client.chat_postMessage(
             channel=channel,
-            text=text
+            text=text,
+            user=user
         )
 
 
