@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import Column, INTEGER, String, ARRAY, DATE, DATETIME
+from sqlalchemy import Column, INTEGER, String, ARRAY, Date, DateTime
 from sqlalchemy.orm import declarative_base
 
 import db
@@ -53,8 +53,8 @@ class Backblast(Base):
         self.n_fngs = len(self.fngs)
 
     id = Column(String, primary_key=True)
-    store_date = Column(DATETIME)
-    date = Column(DATE)
+    store_date = Column(DateTime)
+    date = Column(Date)
     q = Column(String)
     q_id = Column(String)
     ao = Column(String)
@@ -118,5 +118,11 @@ def init_db():
     Base.metadata.create_all(engine)
 
 
+def init_cockroach_db():
+    engine = db.get_cockroach_engine()
+    Base.metadata.create_all(engine)
+
+
 if __name__ == "__main__":
     init_db()
+    init_cockroach_db()

@@ -1,6 +1,8 @@
-slackbot/.secret
 .env
 .env.yaml
 .idea
 __pycache__
 *.pyc
+.secret
+slackbot/.secret
+sheets_task/.secret

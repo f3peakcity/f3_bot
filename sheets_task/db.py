@@ -37,7 +37,7 @@ def get_cockroach_engine():
         connection_string = os.environ.get("CONNECTION_STRING")
         if not connection_string:
             logger.error("No connection string available; please set CONNECTION_STRING environment variable.")
-
+            exit()
         _cockroach_engine = create_engine(connection_string)
     return _cockroach_engine
 
