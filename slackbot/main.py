@@ -30,10 +30,15 @@ app = App(
 @app.command("/paxmate")
 def post_as_paxmate(ack, client, command, logger):
     ack()
+    logger.error(json.dumps(command, indent=2))
     user = command.get("user_id")
     channel = command.get("channel_id")
     text = command.get("text")
     if not text.startswith("say "):
+        client.chat_postEphemeral(
+            channel=channel,
+            text="I don't understand that command. Try saying, /paxmate say I like Banjo."
+        )
         logger.warning(f"unrecognized subcommand: {text}")
         return
     else:
