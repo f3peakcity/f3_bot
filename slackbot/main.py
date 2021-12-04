@@ -36,6 +36,8 @@ def post_as_paxmate(ack, client, command, logger):
     if not text.startswith("say "):
         logger.warning(f"unrecognized subcommand: {text}")
         return
+    else:
+        text = text[4:]
 
     if not (user == "U8LBE9LTW" or user == "UFZR843T6"):
         client.chat_postEphemeral(
