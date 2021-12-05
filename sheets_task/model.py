@@ -13,8 +13,11 @@ class Backblast(Base):
     __tablename__ = 'backblast'
 
     def __init__(self, store_date, date, q, q_id, ao, ao_id, summary, pax, pax_ids, fngs, fng_ids, fngs_raw,
-                 n_visiting_pax, submitter_id, submitter):
-        self.id = uuid.uuid4().hex
+                 n_visiting_pax, submitter_id, submitter, id=None):
+        if id is None:
+            self.id = uuid.uuid4().hex
+        else:
+            self.id = id
         self.store_date = store_date
         self.date = date
         self.q = q

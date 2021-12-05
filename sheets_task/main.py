@@ -37,7 +37,8 @@ def f3_sheets_handler(request):
         fngs_raw=body.get("fngs_raw"),
         n_visiting_pax=body.get("n_visiting_pax"),
         submitter_id=body.get("submitter_id"),
-        submitter=body.get("submitter")
+        submitter=body.get("submitter"),
+        id=body.get("id")
     )
 
     try:
@@ -62,7 +63,8 @@ def f3_sheets_handler(request):
         fngs_raw=body.get("fngs_raw"),
         n_visiting_pax=body.get("n_visiting_pax"),
         submitter_id=body.get("submitter_id"),
-        submitter=body.get("submitter")
+        submitter=body.get("submitter"),
+        id=body.get("id")
     )
 
     try:

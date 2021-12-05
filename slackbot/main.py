@@ -487,7 +487,8 @@ def _parse_backblast_body(body, logger):
         "fngs_raw": fngs_raw,
         "n_visiting_pax": n_visiting_pax,
         "submitter_id": submitter_id,
-        "submitter": submitter
+        "submitter": submitter,
+        "id": uuid.uuid4().hex
     }
     logger.debug(f"Built backblast object: \n{json.dumps(backblast_data, indent=2)}")
     return backblast_data
