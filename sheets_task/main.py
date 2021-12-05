@@ -47,9 +47,27 @@ def f3_sheets_handler(request):
     except Exception as e:
         logger.error(f"Error storing /backblast data to BigQuery: {e}")
 
+    backblast_cockroach = model.Backblast(
+        store_date=datetime.datetime.now(),
+        date=body.get("date"),
+        ao_id=body.get("ao_id"),
+        ao=body.get("ao"),
+        q_id=body.get("q_id"),
+        q=body.get("q"),
+        pax_ids=body.get("pax_ids"),
+        pax=body.get("pax"),
+        summary=body.get("summary"),
+        fng_ids=body.get("fng_ids"),
+        fngs=body.get("fngs"),
+        fngs_raw=body.get("fngs_raw"),
+        n_visiting_pax=body.get("n_visiting_pax"),
+        submitter_id=body.get("submitter_id"),
+        submitter=body.get("submitter")
+    )
+
     try:
         Session = db.get_cockroach_sessionmaker()
-        run_transaction(Session, lambda s: s.add(backblast))
+        run_transaction(Session, lambda s: s.add(backblast_cockroach))
     except Exception as e:
         logger.error(f"Error storing /backblast data to CockroachDb: {e}")
 
