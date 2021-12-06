@@ -8,3 +8,4 @@ google-api-python-client
 pyarrow
 sqlalchemy-cockroachdb
 psycopg2-binary
+slack_bolt
