@@ -377,7 +377,7 @@ def edit_backblast(ack, body, logger):
     dump = json.dumps(body)
     user = body.get("user").get("id")
     channel = body.get("channel").get("id")
-    logger.warning(f"got data: {dump}")
+    logger.info(f"got data: {dump}")
     app.client.chat_postEphemeral(
         channel=channel,
         text=f"I can't edit messages yet, but this is in the works. I saw data: {dump}",
@@ -391,10 +391,10 @@ def handle_backblast_submit(ack, body, logger):
     ack()
     backblast_data = _parse_backblast_body(body, logger)
     now = time.time()
-    logger.warning(f"starting to add to queue after {now - start}")
+    logger.info(f"starting to add to queue after {now - start}")
     _add_data_to_queue(backblast_data, logger)
     now = time.time()
-    logger.warning(f"done adding to queue after {now - start}")
+    logger.info(f"done adding to queue after {now - start}")
 
 
 def _parse_backblast_body(body, logger):

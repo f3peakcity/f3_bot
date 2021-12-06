@@ -148,7 +148,7 @@ def post_messages(backblast_data):
             post_channels = {ao_channel, first_f_channel}
             logger.error(f"Error getting channel info: {e}")
 
-    logger.warning(f"Posting to channels: {post_channels}")
+    logger.info(f"Posting to channels: {post_channels}")
     for post_channel in post_channels:
         try:
             app.client.chat_postMessage(
