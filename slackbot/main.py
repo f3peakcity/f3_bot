@@ -375,12 +375,12 @@ def handle_pax_select_interactive(ack, body, logger):
 def edit_backblast(ack, body, logger):
     ack()
     dump = json.dumps(body)
-    user = body.get("user_id")
-    channel = body.get("channel_id")
+    user = body.get("user").get("id")
+    channel = body.get("channel").get("id")
     logger.warning(f"got data: {dump}")
     app.client.chat_postEphemeral(
         channel=channel,
-        text="I can't edit messages yet, but this is in the works.",
+        text=f"I can't edit messages yet, but this is in the works. I saw data: {dump}",
         user=user
     )
 
