@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 import os
+import time
 import uuid
 
 from google.cloud import tasks_v2
@@ -30,7 +31,7 @@ app = App(
 @app.command("/paxmate")
 def post_as_paxmate(ack, client, command, logger):
     ack()
-    logger.error(json.dumps(command))
+    logger.info(json.dumps(command))
     user = command.get("user_id")
     channel = command.get("channel_id")
     text = command.get("text")
@@ -48,13 +49,13 @@ def post_as_paxmate(ack, client, command, logger):
     if not (user == "U8LBE9LTW" or user == "UFZR843T6"):
         client.chat_postEphemeral(
             channel=channel,
-            text="Sorry, only Banjo has this power."
+            text="Sorry, only Banjo has this power.",
+            user=user
         )
     else:
         client.chat_postMessage(
             channel=channel,
             text=text,
-            user=user
         )
 
 
@@ -372,14 +373,32 @@ def handle_pax_select_interactive(ack, body, logger):
     )
 
 
+@app.action("edit-backblast")
+def edit_backblast(ack, body, logger):
+    ack()
+    dump = json.dumps(body)
+    user = body.get("user_id")
+    channel = body.get("channel_id")
+    logger.warning(f"got data: {dump}")
+    app.client.chat_postEphemeral(
+        channel=channel,
+        text="I can't edit messages yet, but this is in the works.",
+        user=user
+    )
+
+
 @app.view("backblast_modal")
 def handle_backblast_submit(ack, body, logger):
+    start = time.time()
     ack()
     backblast_data = _parse_backblast_body(body, logger)
-
+    now = time.time()
+    logger.warning(f"starting to add to queue after {now - start}")
     _add_data_to_queue(backblast_data, logger)
-    message = util.build_message(backblast_data, logger)
-    if message is None:
+    now = time.time()
+    logger.warning(f"done adding to queue after {now - start}")
+    message_text = util.build_message(backblast_data, logger)
+    if message_text is None:
         return
 
     # Post in the channel(s)
@@ -404,10 +423,35 @@ def handle_backblast_submit(ack, body, logger):
         try:
             app.client.chat_postMessage(
                 channel=post_channel,
-                text=message
+                text=message_text,
+                blocks=[
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": message_text
+                        },
+                        "accessory": {
+                            "type": "overflow",
+                            "action_id": "edit-backblast",
+                            "options": [
+                                {
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "Edit Backblast -- NOT ACTIVE YET",
+                                        "emoji": True
+                                    },
+                                    "value": json.dumps(backblast_data)
+                                }
+                            ]
+                        }
+                    }
+                ]
             )
         except Exception as e:
             logger.error(f"Error posting message to channel: {e}")
+        now = time.time()
+        logger.warning(f"finished actions: {start - now}")
 
 
 def _parse_backblast_body(body, logger):
@@ -523,7 +567,7 @@ def _add_data_to_queue(backblast_data, logger):
                 "headers": {"Content-type": "application/json"},
                 "body": converted_payload
             },
-            "name": client.task_path(project, location, queue, uuid.uuid4().hex)
+            "name": client.task_path(project, location, queue, backblast_data.get("id", uuid.uuid4().hex))
         }
         response = client.create_task(request={"parent": parent, "task": task})
         logger.info(f"Created task {response.name}")
