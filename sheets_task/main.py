@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import os
+import time
 
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
@@ -28,15 +29,21 @@ app = App(
 def f3_sheets_handler(request):
     global service
 
+    start = time.time()
+
     done = False
     retry_count = 0
     body = request.get_json().get("body", {})
 
+    now = time.time()
+    logger.info(f"Starting to send slack messages after {now - start} seconds.")
     try:
         post_messages(backblast_data=body)
     except Exception as e:
         logger.error(f"Error posting messages to slack: {e}")
 
+    now = time.time()
+    logger.info(f"Done sending slack messages after {now - start} seconds.")
     backblast = model.Backblast(
         store_date=datetime.datetime.now(),
         date=body.get("date"),
@@ -62,6 +69,8 @@ def f3_sheets_handler(request):
         session.commit()
     except Exception as e:
         logger.error(f"Error storing /backblast data to BigQuery: {e}")
+    now = time.time()
+    logger.info(f"Done saving to bigquery after {now - start} seconds.")
 
     backblast_cockroach = model.Backblast(
         store_date=datetime.datetime.now(),
@@ -88,6 +97,9 @@ def f3_sheets_handler(request):
     except Exception as e:
         logger.error(f"Error storing /backblast data to CockroachDb: {e}")
 
+    now = time.time()
+    logger.info(f"Done saving to cockroachdb after {now - start} seconds.")
+
     spreadsheet_request_body = {
         "values": backblast.to_rows()
     }
@@ -104,6 +116,9 @@ def f3_sheets_handler(request):
             done = True
         except (ConnectionError, HttpError):
             service = discovery.build('sheets', 'v4', credentials=None)
+
+    now = time.time()
+    logger.info(f"Done saving to sheets after {now - start} seconds.")
 
     return {"status": "ok", "retry_count": retry_count}
 
