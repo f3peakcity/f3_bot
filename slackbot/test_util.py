@@ -1,4 +1,4 @@
-from util import build_message
+from sheets_task.util import build_message
 
 
 def test_message_basic():

@@ -10,8 +10,6 @@ from google.cloud import tasks_v2
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
-import util
-
 client = tasks_v2.CloudTasksClient()
 project = 'f3-carpex'
 queue = 'sheets-append'
@@ -397,61 +395,6 @@ def handle_backblast_submit(ack, body, logger):
     _add_data_to_queue(backblast_data, logger)
     now = time.time()
     logger.warning(f"done adding to queue after {now - start}")
-    message_text = util.build_message(backblast_data, logger)
-    if message_text is None:
-        return
-
-    # Post in the channel(s)
-    first_f_channel = "C8LR0QG5V"
-    backblast_bot_test_channel = "C02HZNS9GHY"
-    ao_channel = backblast_data["ao_id"]
-    try:
-        channel = app.client.conversations_info(channel=ao_channel).get("channel", {})
-        ao_name = channel.get("name", "")
-        post_channels = {ao_channel}
-        if ao_name.startswith("ao"):
-            post_channels.add(first_f_channel)
-
-        if not channel["is_member"]:
-            app.client.conversations_join(channel=ao_channel)
-    except Exception as e:
-        post_channels = {ao_channel, first_f_channel}
-        logger.error(f"Error getting channel info: {e}")
-
-    logger.warning(f"Posting to channels: {post_channels}")
-    for post_channel in post_channels:
-        try:
-            app.client.chat_postMessage(
-                channel=post_channel,
-                text=message_text,
-                blocks=[
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": message_text
-                        },
-                        "accessory": {
-                            "type": "overflow",
-                            "action_id": "edit-backblast",
-                            "options": [
-                                {
-                                    "text": {
-                                        "type": "plain_text",
-                                        "text": "Edit Backblast -- NOT ACTIVE YET",
-                                        "emoji": True
-                                    },
-                                    "value": json.dumps(backblast_data)
-                                }
-                            ]
-                        }
-                    }
-                ]
-            )
-        except Exception as e:
-            logger.error(f"Error posting message to channel: {e}")
-        now = time.time()
-        logger.warning(f"finished actions: {start - now}")
 
 
 def _parse_backblast_body(body, logger):
