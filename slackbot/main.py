@@ -44,7 +44,7 @@ def post_as_paxmate(ack, client, command, logger):
     else:
         text = text[4:]
 
-    if not (user == "U8LBE9LTW" or user == "UFZR843T6"):
+    if not (user in ["U8LBE9LTW", "UFZR843T6", "UFVJ1RZ2Q", "UAHPX7V1Q"]:
         client.chat_postEphemeral(
             channel=channel,
             text="Sorry, only Banjo has this power.",
