@@ -17,6 +17,8 @@ location = 'us-east1'
 url = 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler'
 parent = client.queue_path(project, location, queue)
 
+PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["U8LBE9LTW", "UFZR843T6", "UFVJ1RZ2Q", "UAHPX7V1Q"]
+
 logging.basicConfig(level=logging.INFO)
 
 app = App(
@@ -44,7 +46,7 @@ def post_as_paxmate(ack, client, command, logger):
     else:
         text = text[4:]
 
-    if not (user in ["U8LBE9LTW", "UFZR843T6", "UFVJ1RZ2Q", "UAHPX7V1Q"]:
+    if user not in PAXMATE_SAY_AUTHORIZED_SLACK_IDS:
         client.chat_postEphemeral(
             channel=channel,
             text="Sorry, only Banjo has this power.",
