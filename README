@@ -9,3 +9,6 @@ OPPORTUNITIES TO EXCEL:
  - [DONE] add number of PAX selected to picker
  - [DONE] add field for non-CARPEX PAX
  - add a message showing totals for the day
+ - Change the message to come from the Q and/or the user posting
+ - If backblast length exceeds some amount, only post the full backblast in a thread
+ - Allow tagging users in backblast text itself
