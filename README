@@ -12,3 +12,5 @@ OPPORTUNITIES TO EXCEL:
  - Change the message to come from the Q and/or the user posting
  - If backblast length exceeds some amount, only post the full backblast in a thread
  - Allow tagging users in backblast text itself
+ - Special field for PAX not in slack
+ - Enable editing of existing backblast messages from the current post
