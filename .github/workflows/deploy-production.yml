@@ -5,7 +5,7 @@ on:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/gcf.yml@main
+    uses: jcampbell/f3_bot/.github/workflows/gcf.yml@main
     with:
       slackbot_name: slackbot
       queue_handler_name: f3-sheets-handler
