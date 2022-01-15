@@ -8,7 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: develop
     steps:
-      - uses: ./.github/workflows/gcf.yml@develop
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: gcf.yml@develop
         with:
           environment: develop
           slackbot_name: slackbot-development
