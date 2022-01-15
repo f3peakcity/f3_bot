@@ -4,15 +4,8 @@ on:
     - main
 
 jobs:
-  production:
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - uses: ./.github/workflows/gcf.yml
-        with:
-          environment: production
-          slackbot_name: slackbot
-          queue_handler_name: f3-sheets-handler
+  deploy:
+    uses: ./.github/workflows/gcf.yml@main
+    with:
+      slackbot_name: slackbot
+      queue_handler_name: f3-sheets-handler
