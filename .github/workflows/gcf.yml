@@ -69,6 +69,7 @@ jobs:
       uses: google-github-actions/deploy-cloud-functions@main
       with:
         name: ${{ inputs.slackbot_name }}
+        entry_point: slackbot
         runtime: python39
         region: us-east1
         source_dir: ./slackbot/
