@@ -1,17 +1,23 @@
 name: Deploy slackbot to GCP
 
 on:
-  push:
-    branches:
-    - main
-
-env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      queue_handler_name:
+        required: true
+        type: string
+      slackbot_name:
+        required: true
+        type: string
 
 jobs:
   deploy-queue-handler:
     name: Deploy Queue Handler
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
 
     steps:
     - name: Checkout
@@ -27,16 +33,17 @@ jobs:
     - name: Deploy Queue Handler
       uses: google-github-actions/deploy-cloud-functions@main
       with:
-        name: f3-sheets-handler
+        name: ${{ inputs.queue_handler_name }}
         entry_point: f3_sheets_handler
         runtime: python39
         region: us-east1
         source_dir: ./sheets_task/
-        env_vars: ${{ secrets.SHEETS_HANDLER_ENV_VARS }}
+        env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
 
   deploy-slackbot:
     name: Deploy Slackbot
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
 
     steps:
     - name: Checkout
@@ -52,7 +59,7 @@ jobs:
     - name: Deploy Slackbot
       uses: google-github-actions/deploy-cloud-functions@main
       with:
-        name: slackbot
+        name: ${{ inputs.slackbot_name }}
         runtime: python39
         region: us-east1
         source_dir: ./slackbot/

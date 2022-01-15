@@ -2,10 +2,10 @@ google-api-python-client
 google-cloud-storage
 flask
 sqlalchemy>=1.4.25
+psycopg2-binary
 sqlalchemy-bigquery
 google-cloud-bigquery-storage
 google-api-python-client
 pyarrow
 sqlalchemy-cockroachdb
-psycopg2-binary
 slack_bolt
