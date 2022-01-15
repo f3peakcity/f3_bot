@@ -1,0 +1,15 @@
+on:
+  push:
+    branches:
+    - develop
+
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    environment: develop
+    steps:
+      - uses: ./.github/workflows/gcf.yml@develop
+        with:
+          environment: develop
+          slackbot_name: slackbot-development
+          queue_handler_name: f3-sheets-handler-development

@@ -1,0 +1,15 @@
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: ./.github/workflows/gcf.yml@main
+        with:
+          environment: production
+          slackbot_name: slackbot
+          queue_handler_name: f3-sheets-handler
