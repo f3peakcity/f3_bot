@@ -11,7 +11,7 @@ jobs:
       slackbot_name: slackbot
       queue_handler_name: f3-sheets-handler
     secrets:
-      GCP_SA_KEY: '{{ $secrets.GCP_SA_KEY }}'
-      GCP_PROJECT: '{{ $secrets.GCP_PROJECT }}'
-      SLACKBOT_ENV_VARS: '{{ $secrets.SLACKBOT_ENV_VARS }}'
+      GCP_SA_KEY: '${{ secrets.GCP_SA_KEY }}'
+      GCP_PROJECT: '${{ secrets.GCP_PROJECT }}'
+      SLACKBOT_ENV_VARS: '${{ secrets.SLACKBOT_ENV_VARS }}'
 
