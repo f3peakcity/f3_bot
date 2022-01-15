@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - uses: ./.github/workflows/gcf.yml@main
         with:
           environment: production
