@@ -14,7 +14,7 @@ client = tasks_v2.CloudTasksClient()
 project = 'f3-carpex'
 queue = 'sheets-append'
 location = 'us-east1'
-url = 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler'
+url = os.environ.get("HANDLER_URL", 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler')
 parent = client.queue_path(project, location, queue)
 
 PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["U8LBE9LTW", "UFZR843T6", "UFVJ1RZ2Q", "UAHPX7V1Q"]
