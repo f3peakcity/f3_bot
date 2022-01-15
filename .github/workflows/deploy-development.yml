@@ -4,15 +4,8 @@ on:
     - develop
 
 jobs:
-  development:
-    runs-on: ubuntu-latest
-    environment: develop
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - uses: ./.github/workflows/gcf.yml
-        with:
-          environment: develop
-          slackbot_name: slackbot-development
-          queue_handler_name: f3-sheets-handler-development
+  deploy:
+    uses: ./.github/workflows/gcf.yml@develop
+    with:
+      slackbot_name: slackbot-develop
+      queue_handler_name: f3-sheets-handler-develop
