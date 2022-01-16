@@ -115,17 +115,10 @@ class Backblast(Base):
             rows.append(row)
         return rows
 
-
-def init_db():
-    engine = db.get_engine()
-    Base.metadata.create_all(engine)
-
-
 def init_cockroach_db():
     engine = db.get_cockroach_engine()
     Base.metadata.create_all(engine)
 
 
 if __name__ == "__main__":
-    init_db()
     init_cockroach_db()
