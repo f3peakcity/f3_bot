@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 service = discovery.build('sheets', 'v4')
-spreadsheet_id = '1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY'
+spreadsheet_id = os.environ.get("SPREADSHEET_ID", '1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY')
 
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
