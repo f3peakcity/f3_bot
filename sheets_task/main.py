@@ -44,33 +44,6 @@ def f3_sheets_handler(request):
 
     now = time.time()
     logger.info(f"Done sending slack messages after {now - start} seconds.")
-    backblast = model.Backblast(
-        store_date=datetime.datetime.now(),
-        date=body.get("date"),
-        ao_id=body.get("ao_id"),
-        ao=body.get("ao"),
-        q_id=body.get("q_id"),
-        q=body.get("q"),
-        pax_ids=body.get("pax_ids"),
-        pax=body.get("pax"),
-        summary=body.get("summary"),
-        fng_ids=body.get("fng_ids"),
-        fngs=body.get("fngs"),
-        pax_no_slack=body.get("pax_no_slack"),
-        n_visiting_pax=body.get("n_visiting_pax"),
-        submitter_id=body.get("submitter_id"),
-        submitter=body.get("submitter"),
-        id=body.get("id")
-    )
-
-    try:
-        session = db.get_session()
-        session.add(backblast)
-        session.commit()
-    except Exception as e:
-        logger.error(f"Error storing /backblast data to BigQuery: {e}")
-    now = time.time()
-    logger.info(f"Done saving to bigquery after {now - start} seconds.")
 
     backblast_cockroach = model.Backblast(
         store_date=datetime.datetime.now(),
@@ -101,7 +74,7 @@ def f3_sheets_handler(request):
     logger.info(f"Done saving to cockroachdb after {now - start} seconds.")
 
     spreadsheet_request_body = {
-        "values": backblast.to_rows()
+        "values": backblast_cockroach.to_rows()
     }
 
     while not done and retry_count < 3:
