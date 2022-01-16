@@ -7,28 +7,10 @@ from sqlalchemy.orm import sessionmaker
 logger = logging.getLogger(__name__)
 
 engine = None
-Session = None
+Sesaion = None
 
 _cockroach_engine = None
 _cockroach_session = None
-
-
-def get_engine():
-    global engine
-    global Session
-    if engine is None:
-        engine = create_engine('bigquery://f3-carpex/backblast')
-    return engine
-
-
-def get_session():
-    global engine
-    global Session
-    if engine is None:
-        engine = get_engine()
-
-    Session = sessionmaker(bind=engine)
-    return Session()
 
 
 def get_cockroach_engine():
