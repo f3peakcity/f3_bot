@@ -13,7 +13,7 @@ def test_message_basic():
         "summary": "ran, did merkins, and got swole",
         "fng_ids": [],
         "fngs": [],
-        "fngs_raw": "what_a_guy",
+        "pax_no_slack": "what_a_guy",
         "n_visiting_pax": 0
     }
     assert build_message(backblast_data, None) == """3 posted at <#C8LR0QG5V>.
@@ -34,7 +34,7 @@ def test_message_visitors():
         "summary": "ran, did merkins, and got swole",
         "fng_ids": [],
         "fngs": [],
-        "fngs_raw": "what_a_guy",
+        "pax_no_slack": "what_a_guy",
         "n_visiting_pax": 5
     }
     assert build_message(backblast_data, None) == """8 posted at <#C8LR0QG5V>.

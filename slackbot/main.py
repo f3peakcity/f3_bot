@@ -189,7 +189,7 @@ def open_backblast_form(ack, client, command, logger):
                                 "type": "plain_text",
                                 "text": "Pax Not Yet on Slack"
                             },
-                            "action_id": "fngs-raw",
+                            "action_id": "pax-no-slack",
                         },
                         "label": {
                             "type": "plain_text",
@@ -410,7 +410,7 @@ def _parse_backblast_body(body, logger):
     summary = ""
     fng_ids = []
     fngs = []
-    fngs_raw = ""
+    pax_no_slack = ""
     n_visiting_pax = 0
     submitter_id = ""
     submitter = ""
@@ -438,8 +438,8 @@ def _parse_backblast_body(body, logger):
             if "fng-select" in val:
                 fng_ids = val["fng-select"]["selected_users"]
                 fngs = _get_names_from_id_list(fng_ids)
-            if "fngs-raw" in val:
-                fngs_raw = val["fngs-raw"]["value"]
+            if "pax-no-slack" in val:
+                pax_no_slack = val["pax-no-slack"]["value"]
             if "visiting-pax" in val:
                 visiting_pax = val["visiting-pax"]["selected_option"]
                 if visiting_pax is None:
@@ -473,7 +473,7 @@ def _parse_backblast_body(body, logger):
         "summary": summary,
         "fng_ids": fng_ids,
         "fngs": fngs,
-        "fngs_raw": fngs_raw,
+        "pax_no_slack": pax_no_slack,
         "n_visiting_pax": n_visiting_pax,
         "submitter_id": submitter_id,
         "submitter": submitter,
