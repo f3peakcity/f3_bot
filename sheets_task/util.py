@@ -41,7 +41,7 @@ def build_message(backblast_data, logger):
             fng_str = ", ".join([f"<@{pax}>" for pax in fng_ids])
             message += f"\nFNGs named today: {fng_str}"
         if fngs_raw is not None and len(fngs_raw) > 0:
-            message += f"\nFNGs not yet in slack: {fngs_raw}"
+            message += f"\nPax not yet in slack: {fngs_raw}"
         if n_visiting_pax > 0:
             message += f"\nJoined by {n_visiting_pax} from outside our region."
 

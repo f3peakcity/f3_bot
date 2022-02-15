@@ -187,13 +187,13 @@ def open_backblast_form(ack, client, command, logger):
                             "type": "plain_text_input",
                             "placeholder": {
                                 "type": "plain_text",
-                                "text": "FNGs Not Yet on Slack"
+                                "text": "Pax Not Yet on Slack"
                             },
                             "action_id": "fngs-raw",
                         },
                         "label": {
                             "type": "plain_text",
-                            "text": "Additional FNGs?",
+                            "text": "Additional Pax?",
                             "emoji": True
                         },
                         "optional": True
