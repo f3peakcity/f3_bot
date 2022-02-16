@@ -7,34 +7,16 @@ from sqlalchemy.orm import sessionmaker
 logger = logging.getLogger(__name__)
 
 engine = None
-Session = None
+Sesaion = None
 
 _cockroach_engine = None
 _cockroach_session = None
 
 
-def get_engine():
-    global engine
-    global Session
-    if engine is None:
-        engine = create_engine('bigquery://f3-carpex/backblast')
-    return engine
-
-
-def get_session():
-    global engine
-    global Session
-    if engine is None:
-        engine = get_engine()
-
-    Session = sessionmaker(bind=engine)
-    return Session()
-
-
 def get_cockroach_engine():
     global _cockroach_engine
     if _cockroach_engine is None:
-        connection_string = os.environ.get("CONNECTION_STRING")
+        connection_string = os.environ.get("COCKROACH_CONNECTION_STRING")
         if not connection_string:
             logger.error("No connection string available; please set CONNECTION_STRING environment variable.")
             exit()
