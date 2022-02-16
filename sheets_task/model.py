@@ -12,7 +12,7 @@ Base = declarative_base()
 class Backblast(Base):
     __tablename__ = 'backblast'
 
-    def __init__(self, store_date, date, q, q_id, ao, ao_id, summary, pax, pax_ids, fngs, fng_ids, fngs_raw,
+    def __init__(self, store_date, date, q, q_id, ao, ao_id, summary, pax, pax_ids, fngs, fng_ids, pax_no_slack,
                  n_visiting_pax, submitter_id, submitter, id=None):
         if id is None:
             self.id = uuid.uuid4().hex
@@ -29,7 +29,7 @@ class Backblast(Base):
         self.pax_ids = pax_ids
         self.fngs = fngs
         self.fng_ids = fng_ids
-        self.fngs_raw = fngs_raw
+        self.pax_no_slack = pax_no_slack
         self.n_visiting_pax = n_visiting_pax
         self.submitter_id = submitter_id
         self.submitter = submitter
@@ -69,7 +69,7 @@ class Backblast(Base):
     n_fngs = Column(INTEGER)
     fngs = Column(ARRAY(String))
     fng_ids = Column(ARRAY(String))
-    fngs_raw = Column(String)
+    pax_no_slack = Column(String)
     n_visiting_pax = Column(INTEGER)
     submitter_id = Column(String)
     submitter = Column(String)
@@ -90,10 +90,10 @@ class Backblast(Base):
         else:
             date = "_unknown_"
 
-        if self.fngs_raw is None or len(self.fngs_raw) == 0:
-            fngs_raw_str = "_"
+        if self.pax_no_slack is None or len(self.pax_no_slack) == 0:
+            pax_no_slack_str = "_"
         else:
-            fngs_raw_str = self.fngs_raw
+            pax_no_slack_str = self.pax_no_slack
 
         for i in range(n_rows):
             row = [
@@ -105,7 +105,7 @@ class Backblast(Base):
                 self.all_pax[i][0] if i < len(self.all_pax) else "",  # id
                 self.n_fngs,
                 self.fngs[i] if i < len(self.fngs) else "_",
-                fngs_raw_str,
+                pax_no_slack_str,
                 self.n_visiting_pax,
                 self.submitter,
                 self.submitter_id,

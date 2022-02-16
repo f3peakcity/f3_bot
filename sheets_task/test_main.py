@@ -24,7 +24,7 @@ def backblast(_):
         summary="ran, did merkins, and got swole",
         fng_ids=[],
         fngs=[],
-        fngs_raw="what_a_guy",
+        pax_no_slack="what_a_guy",
         n_visiting_pax=5
     )
     return backblast
