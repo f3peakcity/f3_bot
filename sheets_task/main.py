@@ -35,15 +35,6 @@ def f3_sheets_handler(request):
     retry_count = 0
     body = request.get_json().get("body", {})
 
-    now = time.time()
-    logger.info(f"Starting to send slack messages after {now - start} seconds.")
-    try:
-        post_messages(backblast_data=body)
-    except Exception as e:
-        logger.error(f"Error posting messages to slack: {e}")
-
-    now = time.time()
-    logger.info(f"Done sending slack messages after {now - start} seconds.")
     backblast = model.Backblast(
         store_date=datetime.datetime.now(),
         date=body.get("date"),
@@ -119,6 +110,14 @@ def f3_sheets_handler(request):
 
     now = time.time()
     logger.info(f"Done saving to sheets after {now - start} seconds.")
+
+    try:
+        post_messages(backblast_data=body)
+    except Exception as e:
+        logger.error(f"Error posting messages to slack: {e}")
+
+    now = time.time()
+    logger.info(f"Done sending slack messages after {now - start} seconds.")
 
     return {"status": "ok", "retry_count": retry_count}
 
