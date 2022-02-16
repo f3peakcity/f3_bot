@@ -4,7 +4,10 @@ import datetime
 import pytest
 from unittest import mock
 
+from sqlalchemy_cockroachdb import run_transaction
+
 import model
+from sheets_task import db
 
 mock_uuid = uuid.UUID("a5b54c95d475477583e1c2a60cb6bdc7")
 
@@ -25,7 +28,9 @@ def backblast(_):
         fng_ids=[],
         fngs=[],
         pax_no_slack="what_a_guy",
-        n_visiting_pax=5
+        n_visiting_pax=5,
+        submitter="ME",
+        submitter_id="QWERTY123"
     )
     return backblast
 
@@ -42,6 +47,8 @@ def test_row_conversion(backblast):
                       '_',
                       'what_a_guy',
                       5,
+                      'ME',
+                      'QWERTY123',
                       'a5b54c95d475477583e1c2a60cb6bdc7',
                       '2021-10-20T11:11:11'],
                      ['2021-10-20',
@@ -54,6 +61,8 @@ def test_row_conversion(backblast):
                       '_',
                       'what_a_guy',
                       5,
+                      'ME',
+                      'QWERTY123',
                       'a5b54c95d475477583e1c2a60cb6bdc7',
                       '2021-10-20T11:11:11'],
                      ['2021-10-20',
@@ -66,6 +75,8 @@ def test_row_conversion(backblast):
                       '_',
                       'what_a_guy',
                       5,
+                      'ME',
+                      'QWERTY123',
                       'a5b54c95d475477583e1c2a60cb6bdc7',
                       '2021-10-20T11:11:11']]
 
@@ -77,3 +88,17 @@ def test_row_conversion(backblast):
         return set(normalized)
 
     assert normalize_rows(rows) == normalize_rows(expected_rows)
+
+
+def test_to_rows_following_saving(backblast):
+    try:
+        Session = db.get_cockroach_sessionmaker()
+        run_transaction(Session, lambda s: s.add(backblast))
+    except Exception as e:
+        print(e)
+
+    spreadsheet_request_body = {
+        "values": backblast.to_rows()
+    }
+
+    print(spreadsheet_request_body)

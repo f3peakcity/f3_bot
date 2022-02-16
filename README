@@ -19,3 +19,6 @@ Notes:
 
 - The gcloud auth step in github actions *requires that the json service account credentials are base64 encoded*
   - Run `cat service_account_credentials.json | base64`
+- Duplicate slack posts occur when there's a duplicate delivery of the message,
+which can result from a crash on the subscribing cloud function, for example
+when a session connection has expired.
