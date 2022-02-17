@@ -59,11 +59,11 @@ def f3_sheets_handler(request):
     try:
         Session = db.get_cockroach_sessionmaker()
         run_transaction(Session, lambda s: s.add(backblast_cockroach))
+        now = time.time()
+        logger.info(f"Done saving to cockroachdb after {now - start} seconds.")
     except Exception as e:
         logger.error(f"Error storing /backblast data to CockroachDb: {e}")
 
-    now = time.time()
-    logger.info(f"Done saving to cockroachdb after {now - start} seconds.")
 
     spreadsheet_request_body = {
         "values": backblast_cockroach.to_rows()
