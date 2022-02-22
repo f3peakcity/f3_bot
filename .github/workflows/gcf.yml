@@ -45,7 +45,7 @@ jobs:
         entry_point: f3_sheets_handler
         runtime: python39
         region: us-east1
-        source_dir: ./sheets_task/src/sheets_task
+        source_dir: ./sheets_task/src
         env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
 
   deploy-slackbot:

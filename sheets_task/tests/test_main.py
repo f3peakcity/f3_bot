@@ -7,8 +7,7 @@ import sqlalchemy
 
 from sqlalchemy_cockroachdb import run_transaction
 
-import sheets_task.model
-import sheets_task.db
+import sheets_task
 
 mock_uuid = uuid.UUID("a5b54c95d475477583e1c2a60cb6bdc7")
 

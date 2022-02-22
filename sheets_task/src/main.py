@@ -9,9 +9,7 @@ from googleapiclient.errors import HttpError
 from slack_bolt import App
 from sqlalchemy_cockroachdb import run_transaction
 
-import sheets_task.db
-import sheets_task.model
-import sheets_task.util
+import sheets_task
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
