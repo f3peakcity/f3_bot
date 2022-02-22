@@ -10,3 +10,4 @@ sheets_task/.secret
 .venv
 
 *.egg-info/
+.vscode/
