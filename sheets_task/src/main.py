@@ -14,7 +14,7 @@ import sheets_task
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-service = discovery.build('sheets', 'v4')
+service = discovery.build('sheets', 'v4', cache_discovery=False)
 
 # Spreadsheet to which to save data
 spreadsheet_id = os.environ.get("SPREADSHEET_ID", '1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY')
@@ -30,9 +30,6 @@ def f3_sheets_handler(request):
     global service
 
     start = time.time()
-
-    done = False
-    retry_count = 0
     body = request.get_json().get("body", {})
 
     backblast = sheets_task.model.Backblast(
@@ -72,9 +69,10 @@ def f3_sheets_handler(request):
     except Exception as e:
         logger.error(f"Error building spreadsheet model: {e}")
 
-    retry_count = 0
-    while not done and retry_count < 3:
-        retry_count += 1
+    try_count = 0
+    done = False
+    while not done and try_count < 3:
+        try_count += 1
         try:
             service.spreadsheets().values().append(
                 spreadsheetId=spreadsheet_id,
@@ -84,10 +82,10 @@ def f3_sheets_handler(request):
             ).execute()
             done = True
         except (ConnectionError, HttpError):
-            service = discovery.build('sheets', 'v4', credentials=None)
+            service = discovery.build('sheets', 'v4', cache_discovery=False)
 
     now = time.time()
-    logger.info(f"Done saving to sheets after {now - start} seconds (retry count: {retry_count}).")
+    logger.info(f"Done saving to sheets after {now - start} seconds (try count: {try_count}).")
 
     try:
         post_messages(backblast_data=body)
@@ -97,7 +95,7 @@ def f3_sheets_handler(request):
     now = time.time()
     logger.info(f"Done sending slack messages after {now - start} seconds.")
 
-    return {"status": "ok", "retry_count": retry_count}
+    return {"status": "ok", "try_count": try_count}
 
 
 def post_messages(backblast_data):
