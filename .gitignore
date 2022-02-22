@@ -6,3 +6,7 @@ __pycache__
 .secret
 slackbot/.secret
 sheets_task/.secret
+
+.venv
+
+*.egg-info/

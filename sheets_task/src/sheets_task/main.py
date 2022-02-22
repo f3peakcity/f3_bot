@@ -9,9 +9,9 @@ from googleapiclient.errors import HttpError
 from slack_bolt import App
 from sqlalchemy_cockroachdb import run_transaction
 
-import db
-import model
-import util
+import sheets_task.db
+import sheets_task.model
+import sheets_task.util
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def f3_sheets_handler(request):
     retry_count = 0
     body = request.get_json().get("body", {})
 
-    backblast_cockroach = model.Backblast(
+    backblast = sheets_task.model.Backblast(
         store_date=datetime.datetime.now(),
         date=body.get("date"),
         ao_id=body.get("ao_id"),
@@ -57,7 +57,8 @@ def f3_sheets_handler(request):
     )
 
     try:
-        Session = db.get_cockroach_sessionmaker()
+        Session = sheets_task.db.get_cockroach_sessionmaker()
+        backblast_cockroach = backblast.get_sqlalchemy_model()
         run_transaction(Session, lambda s: s.add(backblast_cockroach))
         now = time.time()
         logger.info(f"Done saving to cockroachdb after {now - start} seconds.")
@@ -65,10 +66,15 @@ def f3_sheets_handler(request):
         logger.error(f"Error storing /backblast data to CockroachDb: {e}")
 
 
-    spreadsheet_request_body = {
-        "values": backblast_cockroach.to_rows()
-    }
+    spreadsheet_request_body = {"values": []}
+    try:
+        spreadsheet_request_body = {
+            "values": backblast.get_rows_model()
+        }
+    except Exception as e:
+        logger.error(f"Error building spreadsheet model: {e}")
 
+    retry_count = 0
     while not done and retry_count < 3:
         retry_count += 1
         try:
@@ -83,7 +89,7 @@ def f3_sheets_handler(request):
             service = discovery.build('sheets', 'v4', credentials=None)
 
     now = time.time()
-    logger.info(f"Done saving to sheets after {now - start} seconds.")
+    logger.info(f"Done saving to sheets after {now - start} seconds (retry count: {retry_count}).")
 
     try:
         post_messages(backblast_data=body)
@@ -97,7 +103,7 @@ def f3_sheets_handler(request):
 
 
 def post_messages(backblast_data):
-    message_text = util.build_message(backblast_data, logger)
+    message_text = sheets_task.util.build_message(backblast_data, logger)
     if message_text is None:
         return
 
