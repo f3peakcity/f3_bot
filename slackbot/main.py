@@ -17,7 +17,7 @@ location = 'us-east1'
 url = os.environ.get("HANDLER_URL", 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler')
 parent = client.queue_path(project, location, queue)
 
-PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["U8LBE9LTW", "UFZR843T6", "UFVJ1RZ2Q", "UAHPX7V1Q"]
+PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["U8LBE9LTW", "UFZR843T6", "UFVJ1RZ2Q", "UAHPX7V1Q", "ULFRBEH0Q"]
 
 logging.basicConfig(level=logging.INFO)
 
