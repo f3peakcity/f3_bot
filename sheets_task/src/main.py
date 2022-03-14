@@ -105,6 +105,7 @@ def post_messages(backblast_data):
 
     # Post in the channel(s)
     first_f_channel = "C8LR0QG5V"
+    third_f_channel = "C8LQGJ4KZ"
     backblast_bot_test_channel = "C02HZNS9GHY"
     ao_channel = backblast_data["ao_id"]
     if ao_channel is None or ao_channel == "":
@@ -117,10 +118,13 @@ def post_messages(backblast_data):
             if ao_name.startswith("ao"):
                 post_channels.add(first_f_channel)
 
+            if ao_name.startswith("3rdf"):
+                post_channels.add(third_f_channel)
+
             if not channel["is_member"]:
                 app.client.conversations_join(channel=ao_channel)
         except Exception as e:
-            post_channels = {ao_channel, first_f_channel}
+            post_channels = {ao_channel}
             logger.error(f"Error getting channel info: {e}")
 
     logger.info(f"Posting to channels: {post_channels}")
