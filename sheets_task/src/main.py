@@ -103,6 +103,8 @@ def post_messages(backblast_data):
     if message_text is None:
         return
 
+    message_text_blocks = sheets_task.util.get_message_blocks_from_message_text(message_text=message_text)
+
     # Post in the channel(s)
     first_f_channel = "C8LR0QG5V"
     third_f_channel = "C8LQGJ4KZ"
@@ -128,34 +130,35 @@ def post_messages(backblast_data):
             logger.error(f"Error getting channel info: {e}")
 
     logger.info(f"Posting to channels: {post_channels}")
-    for post_channel in post_channels:
-        try:
-            app.client.chat_postMessage(
-                channel=post_channel,
-                text=message_text,
-                blocks=[
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": message_text
-                        },
-                        "accessory": {
-                            "type": "overflow",
-                            "action_id": "edit-backblast",
-                            "options": [
-                                {
-                                    "text": {
-                                        "type": "plain_text",
-                                        "text": "Edit Backblast -- NOT ACTIVE YET",
-                                        "emoji": True
-                                    },
-                                    "value": json.dumps({"id": backblast_data["id"]})
-                                }
-                            ]
+    for message_text in message_text_blocks:
+        for post_channel in post_channels:
+            try:
+                app.client.chat_postMessage(
+                    channel=post_channel,
+                    text=message_text,
+                    blocks=[
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": message_text
+                            },
+                            "accessory": {
+                                "type": "overflow",
+                                "action_id": "edit-backblast",
+                                "options": [
+                                    {
+                                        "text": {
+                                            "type": "plain_text",
+                                            "text": "Edit Backblast -- NOT ACTIVE YET",
+                                            "emoji": True
+                                        },
+                                        "value": json.dumps({"id": backblast_data["id"]})
+                                    }
+                                ]
+                            }
                         }
-                    }
-                ]
-            )
-        except Exception as e:
-            logger.error(f"Error posting message to channel: {e}")
+                    ]
+                )
+            except Exception as e:
+                logger.error(f"Error posting message to channel: {e}")

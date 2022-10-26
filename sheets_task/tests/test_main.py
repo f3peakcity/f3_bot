@@ -125,3 +125,15 @@ def test_to_rows_following_saving(backblast):
         run_transaction(Session, lambda s: s.query(sheets_task.model.SqlAlchemyBackblast).filter_by(id=backblast.id).delete())
     except Exception as e:
         raise
+
+def test__get_message_blocks_from_message_text():
+    message_blocks = sheets_task.util.get_message_blocks_from_message_text("test")
+    assert message_blocks == ["test"]
+
+    message_text = "hello" * 3000
+    message_blocks = sheets_task.util.get_message_blocks_from_message_text(message_text)
+    assert len(message_blocks) == 6
+    assert message_blocks[0][-3:] == "..."
+    assert message_blocks[1][:3] == "..."
+    assert message_blocks[1][-3:] == "..."
+    assert message_blocks[-1][-5:] == "hello"

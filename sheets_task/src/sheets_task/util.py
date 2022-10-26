@@ -1,3 +1,6 @@
+from typing import List
+from math import ceil
+
 def get_worked_phrase(summary):
     # If you want to have some fun with customizing the summary...
     # return "got pushed to their max"
@@ -49,3 +52,21 @@ def build_message(backblast_data, logger):
     except Exception as e:
         logger.error(f"Error building message: {e}")
 
+def get_message_blocks_from_message_text(message_text: str) -> List[str]:
+    # slack imposes a 3000 character-per-block limit
+    block_limit = 2900
+    message_text_blocks = []
+    if len(message_text) > block_limit:
+        n_blocks = ceil(len(message_text) / block_limit)
+        start = 0
+        end = block_limit
+        first = message_text[start:end] + "..."
+        message_text_blocks.append(first)
+        for i in range(1, n_blocks-1):
+            start = i * block_limit
+            end = (i+1) * block_limit
+            message_text_blocks.append("..." + message_text[start:end] + "...")
+        message_text_blocks.append("..." + message_text[end:])
+    else:
+        message_text_blocks.append(message_text)
+    return message_text_blocks
