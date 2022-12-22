@@ -17,7 +17,9 @@ location = 'us-east1'
 url = os.environ.get("HANDLER_URL", 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler')
 parent = client.queue_path(project, location, queue)
 
-PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["U8LBE9LTW", "UFZR843T6", "UFVJ1RZ2Q", "UAHPX7V1Q", "ULFRBEH0Q"]
+# TODO(multi-tenant) have to make this configurable or just allow workspace admins
+# Clockwork, Wahoo Peak City
+PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["U046A6PJF5X", "U04FR32HU48"]
 
 logging.basicConfig(level=logging.INFO)
 
@@ -49,7 +51,8 @@ def post_as_paxmate(ack, client, command, logger):
     if user not in PAXMATE_SAY_AUTHORIZED_SLACK_IDS:
         client.chat_postEphemeral(
             channel=channel,
-            text="Sorry, only Banjo has this power.",
+            # TODO(multi-tenant) look this up based on the list of slack ids
+            text="Sorry, only Wahoo and Clockwork have this power.",
             user=user
         )
     else:
@@ -75,7 +78,9 @@ def open_backblast_form(ack, client, command, logger):
                 "callback_id": "backblast_modal",
                 "title": {
                     "type": "plain_text",
-                    "text": "F3 Carpex PAX Assistant",
+                    # TODO(multi-tenant) Add customization of this header.
+                    # There is a 25 character limit.
+                    "text": "F3 Peak City PaxMate",
                     "emoji": True
                 },
                 "submit": {
