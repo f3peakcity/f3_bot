@@ -16,9 +16,11 @@ logger = logging.getLogger(__name__)
 
 service = discovery.build('sheets', 'v4', cache_discovery=False)
 
+# TODO(multi-tenant) may want to bifurcate this data
 # Spreadsheet to which to save data
 spreadsheet_id = os.environ.get("SPREADSHEET_ID", '1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY')
 
+# TODO(multi-tenant) this will need to change to an oauth flow
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
@@ -106,9 +108,10 @@ def post_messages(backblast_data):
     message_text_blocks = sheets_task.util.get_message_blocks_from_message_text(message_text=message_text)
 
     # Post in the channel(s)
-    first_f_channel = "C04N5CWSQAU"
-    third_f_channel = "C04M16B71SB"
-    backblast_bot_test_channel = "C02HZNS9GHY"
+    # TODO(multi-tenant) we'll need to look these up or provide a way for folks to configure it
+    first_f_channel = "C04F1C0HY2F"
+    third_f_channel = "C045XHF4MMG"
+    backblast_bot_test_channel = "C04H38NN2QG"
     ao_channel = backblast_data["ao_id"]
     if ao_channel is None or ao_channel == "":
         post_channels = {first_f_channel}
@@ -118,11 +121,16 @@ def post_messages(backblast_data):
             ao_name = channel.get("name", "")
             post_channels = {ao_channel}
             if ao_name.startswith("ao"):
+                # TODO(multi-tenant) Remove the duplicate post to the AO channel if 1stf
+                # need to talk this over with both SLTs
+                post_channels.remove(ao_channel)
                 post_channels.add(first_f_channel)
 
             if ao_name.startswith("3rdf"):
                 post_channels.add(third_f_channel)
 
+            # TODO we should auto-join the 1stf/3rdf channel as well
+            # not just this AO channel.
             if not channel["is_member"]:
                 app.client.conversations_join(channel=ao_channel)
         except Exception as e:
