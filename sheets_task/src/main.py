@@ -109,8 +109,8 @@ def post_messages(backblast_data):
 
     # Post in the channel(s)
     # TODO(multi-tenant) we'll need to look these up or provide a way for folks to configure it
-    first_f_channel = "C04F1C0HY2F"
-    third_f_channel = "C045XHF4MMG"
+    first_f_channel = "C04H3NW8JQM"
+    third_f_channel = "C04GS5M55F1"
     backblast_bot_test_channel = "C04H38NN2QG"
     ao_channel = backblast_data["ao_id"]
     if ao_channel is None or ao_channel == "":

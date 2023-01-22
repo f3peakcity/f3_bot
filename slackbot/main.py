@@ -18,8 +18,8 @@ url = os.environ.get("HANDLER_URL", 'https://us-east1-f3-carpex.cloudfunctions.n
 parent = client.queue_path(project, location, queue)
 
 # TODO(multi-tenant) have to make this configurable or just allow workspace admins
-# Clockwork, Wahoo Peak City
-PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["U046A6PJF5X", "U04FR32HU48"]
+# PomPom, Cadence, Trike and Wahoo - Green Level
+PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["D04HJL3TTSP", "D04HC5WB2VC", "D04J8EK61CG", "D04HM7PUQH2"]
 
 logging.basicConfig(level=logging.INFO)
 
@@ -52,7 +52,7 @@ def post_as_paxmate(ack, client, command, logger):
         client.chat_postEphemeral(
             channel=channel,
             # TODO(multi-tenant) look this up based on the list of slack ids
-            text="Sorry, only Wahoo and Clockwork have this power.",
+            text="Sorry, only Pom Pom, Cadence, and Wahoo have this power.",
             user=user
         )
     else:
@@ -80,7 +80,7 @@ def open_backblast_form(ack, client, command, logger):
                     "type": "plain_text",
                     # TODO(multi-tenant) Add customization of this header.
                     # There is a 25 character limit.
-                    "text": "F3 Peak City PaxMate",
+                    "text": "F3 Green Level PaxMate",
                     "emoji": True
                 },
                 "submit": {
