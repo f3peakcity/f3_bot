@@ -106,8 +106,8 @@ def post_messages(backblast_data):
     message_text_blocks = sheets_task.util.get_message_blocks_from_message_text(message_text=message_text)
 
     # Post in the channel(s)
-    first_f_channel = "C8LR0QG5V"
-    third_f_channel = "C8LQGJ4KZ"
+    first_f_channel = "C04N5CWSQAU"
+    third_f_channel = "C04M16B71SB"
     backblast_bot_test_channel = "C02HZNS9GHY"
     ao_channel = backblast_data["ao_id"]
     if ao_channel is None or ao_channel == "":
