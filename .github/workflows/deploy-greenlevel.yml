@@ -1,4 +1,4 @@
-name: Deploy peakcity slackbot
+name: Deploy Green Level slackbot
 
 on:
   push:
@@ -10,9 +10,9 @@ jobs:
     uses: f3peakcity/f3_bot/.github/workflows/gcf.yml@main
     with:
       environment: peakcity
-      slackbot_name: slackbot-peakcity
-      queue_handler_name: f3-sheets-handler-peakcity
-      env_vars_file: ./.github/workflows/env-peakcity.yml
+      slackbot_name: slackbot-greenlevel
+      queue_handler_name: f3-sheets-handler-greenlevel
+      env_vars_file: ./.github/workflows/env-greenlevel.yml
     secrets:
       GCP_SA_KEY: '${{ secrets.GCP_SA_KEY }}'
       GCP_PROJECT: '${{ secrets.GCP_PROJECT }}'

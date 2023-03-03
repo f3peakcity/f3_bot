@@ -10,16 +10,20 @@ from google.cloud import tasks_v2
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
-client = tasks_v2.CloudTasksClient()
-project = 'f3-carpex'
-queue = os.environ.get("QUEUE_NAME", "sheets-append")
-location = 'us-east1'
-url = os.environ.get("HANDLER_URL", 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler')
-parent = client.queue_path(project, location, queue)
+class SlackbotConfig:
+    def __init__(self):
+        self.gcp_project = 'f3-carpex'
+        self.gcp_location = 'us-east1'
+        self.gcp_queue_name = os.environ.get("QUEUE_NAME", "sheets-append")
+        self.handler_url = os.environ.get("HANDLER_URL", 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler')
 
-# TODO(multi-tenant) have to make this configurable or just allow workspace admins
-# Clockwork, Wahoo Peak City
-PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["U046A6PJF5X", "U04FR32HU48"]
+        # Default to empty, but expect a comma separated list of IDs
+        self.paxmate_say_authorized_slack_ids = os.environ.get("PAXMATE_SAY_AUTHORIZED_SLACK_IDS", "").split(",")
+
+slackbot_config = SlackbotConfig()
+
+client = tasks_v2.CloudTasksClient()
+parent = client.queue_path(slackbot_config.gcp_project, slackbot_config.gcp_location, slackbot_config.gcp_queue_name)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -28,7 +32,6 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
     process_before_response=True,
 )
-
 
 @app.command("/paxmate")
 def post_as_paxmate(ack, client, command, logger):
@@ -48,7 +51,7 @@ def post_as_paxmate(ack, client, command, logger):
     else:
         text = text[4:]
 
-    if user not in PAXMATE_SAY_AUTHORIZED_SLACK_IDS:
+    if user not in slackbot_config.paxmate_say_authorized_slack_ids:
         client.chat_postEphemeral(
             channel=channel,
             # TODO(multi-tenant) look this up based on the list of slack ids
@@ -513,7 +516,7 @@ def _add_data_to_queue(backblast_data, logger):
         task = {
             "http_request": {
                 "http_method": tasks_v2.HttpMethod.POST,
-                "url": url,
+                "url": slackbot_config.handler_url,
                 "headers": {"Content-type": "application/json"},
                 "body": converted_payload
             },
@@ -527,10 +530,10 @@ def _add_data_to_queue(backblast_data, logger):
 
 handler = SlackRequestHandler(app)
 
-
 def slackbot(request):
+    if request.method == "GET" and request.path == '/healthz':
+        logging.getLogger().info('Health check')
     return handler.handle(request)
-
 
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))

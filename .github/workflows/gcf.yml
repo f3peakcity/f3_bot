@@ -12,6 +12,9 @@ on:
       slackbot_name:
         required: true
         type: string
+      env_vars_file:
+        required: true
+        type: string
     secrets:
       GCP_SA_KEY:
         required: true
@@ -47,6 +50,7 @@ jobs:
         region: us-east1
         source_dir: ./sheets_task/src
         env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
+        env_vars_file: ${{ inputs.env_vars_file }}
 
   deploy-slackbot:
     name: Deploy Slackbot
@@ -74,3 +78,4 @@ jobs:
         region: us-east1
         source_dir: ./slackbot/
         env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
+        env_vars_file: ${{ inputs.env_vars_file }}

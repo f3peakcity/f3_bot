@@ -5,7 +5,7 @@ on:
 
 jobs:
   deploy:
-    uses: jcampbell/f3_bot/.github/workflows/gcf.yml@main
+    uses: f3peakcity/f3_bot/.github/workflows/gcf.yml@main
     with:
       environment: production
       slackbot_name: slackbot

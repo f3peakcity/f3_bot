@@ -1,0 +1,3 @@
+PAXMATE_SAY_AUTHORIZED_SLACK_IDS: "U04M6R3FPBN,U04P1JJT2G6"
+BACKBLAST_QUEUE_NAME: sheets-append-develop
+BACKBLAST_HANDLER_URL: "https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler-develop"
