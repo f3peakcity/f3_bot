@@ -149,7 +149,7 @@ def do_pipeline(sheet_id: str):
 
 
 if __name__ == "__main__":
-    print("Starting data workflow")
+    print("Starting data workflow.")
     sheet_id = os.environ.get("SPREADSHEET_ID", "1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
     do_pipeline(sheet_id=sheet_id)
-    print("completed data workflow")
+    print("Completed data workflow.")
