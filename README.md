@@ -23,3 +23,8 @@
 - Duplicate slack posts occur when there's a duplicate delivery of the message,
   which can result from a crash on the subscribing cloud function, for example
   when a session connection has expired.
+
+### Development:
+
+Use the `develop` branch for development.
+The Pipfile supports development with `pipenv`.
