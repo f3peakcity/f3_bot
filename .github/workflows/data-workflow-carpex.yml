@@ -1,10 +1,6 @@
 name: Data Workflow - Carpex
 
 on:
-  push:
-    branches:
-    - develop
-
   schedule:
     - cron: "23 19 * * *"
 
