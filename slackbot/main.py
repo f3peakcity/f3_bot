@@ -520,7 +520,7 @@ def _add_data_to_queue(backblast_data, logger):
                 "headers": {"Content-type": "application/json"},
                 "body": converted_payload
             },
-            "name": client.task_path(project, location, queue, backblast_data.get("id", uuid.uuid4().hex))
+            "name": client.task_path(slackbot_config.gcp_project, slackbot_config.gcp_location, slackbot_config.gcp_queue_name, backblast_data.get("id", uuid.uuid4().hex))
         }
         response = client.create_task(request={"parent": parent, "task": task})
         logger.info(f"Created task {response.name}")
