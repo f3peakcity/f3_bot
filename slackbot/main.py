@@ -14,11 +14,11 @@ class SlackbotConfig:
     def __init__(self):
         self.gcp_project = 'f3-carpex'
         self.gcp_location = 'us-east1'
-        self.gcp_queue_name = os.environ.get("QUEUE_NAME", "sheets-append")
-        self.handler_url = os.environ.get("HANDLER_URL", 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler')
+        self.gcp_queue_name = os.environ.get("BACKBLAST_QUEUE_NAME")
+        self.handler_url = os.environ.get("BACKBLAST_HANDLER_URL")
 
         # Default to empty, but expect a comma separated list of IDs
-        self.paxmate_say_authorized_slack_ids = os.environ.get("PAXMATE_SAY_AUTHORIZED_SLACK_IDS", "").split(",")
+        self.paxmate_say_authorized_slack_ids = os.environ.get("PAXMATE_SAY_AUTHORIZED_SLACK_IDS", "").replace(" ", "").split(",")
 
 slackbot_config = SlackbotConfig()
 

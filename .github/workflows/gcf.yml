@@ -16,8 +16,8 @@ on:
         required: true
         type: string
     secrets:
-      GCP_SA_KEY:
-        required: true
+      # GCP_SA_KEY:
+      #   required: true
       GCP_PROJECT:
         required: true
       SLACKBOT_ENV_VARS:
@@ -34,9 +34,15 @@ jobs:
       uses: actions/checkout@v3
 
     - id: 'auth'
-      uses: 'google-github-actions/auth@v0'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
       with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        workload_identity_provider: 'projects/330812298791/locations/global/workloadIdentityPools/github/providers/github'
+        service_account: 'github-action-runner@f3-carpex.iam.gserviceaccount.com'
+    # - id: 'auth'
+    #   uses: 'google-github-actions/auth@v0'
+    #   with:
+    #     credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v0'
