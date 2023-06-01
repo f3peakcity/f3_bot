@@ -99,7 +99,7 @@ def open_backblast_form(ack, client, command, logger):
                     "text": "Cancel",
                     "emoji": True
                 },
-                "private_metadata": f'{"initial_channel": "{channel}", "team": "{team}"}',
+                "private_metadata": f'{{"initial_channel": "{channel}", "team": "{team}"}}',
                 # body of the view
                 "blocks": [
                     {
