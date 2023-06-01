@@ -13,7 +13,7 @@ def get_raw_data(sheet_id: str, sheet_name: str = "__RAW") -> pd.DataFrame:
     """Get raw data from the spreadsheet and load to pandas for processing.
     Manually specify the column names based on knowledge of the backblast format."""
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
-    column_names = ["date", "q", "ao", "n_pax", "pax", "pax_id", "n_fngs", "fng_id", "pax_no_slack", "n_visiting_pax", "submitter", "submitter_id", "id", "store_date"]
+    column_names = ["date", "q", "ao", "n_pax", "pax", "pax_id", "n_fngs", "fng_id", "pax_no_slack", "n_visiting_pax", "submitter", "submitter_id", "id", "store_date", "q_id", "team_id"]
     df = pd.read_csv(url, names=column_names, parse_dates=["date", "store_date"])
     return df
 
