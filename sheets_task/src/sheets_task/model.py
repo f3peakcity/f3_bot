@@ -12,11 +12,12 @@ Base = declarative_base()
 class Backblast():
 
     def __init__(self, store_date, date, q, q_id, ao, ao_id, summary, pax, pax_ids, fngs, fng_ids, pax_no_slack,
-                 n_visiting_pax, submitter_id, submitter, id=None) -> None:
+                 n_visiting_pax, submitter_id, submitter, team_id, id=None) -> None:
         if id is None:
             self.id = uuid.uuid4().hex
         else:
             self.id = id
+        self.team_id = team_id
         self.store_date = store_date
         self.date = date
         self.q = q
@@ -90,7 +91,9 @@ class Backblast():
                 self.submitter,
                 self.submitter_id,
                 self.id,
-                store_date
+                store_date,
+                self.q_id,
+                self.team_id
             ]
             rows.append(row)
         return rows
@@ -114,6 +117,7 @@ class Backblast():
         sqlalchemy_backblast.n_visiting_pax = self.n_visiting_pax
         sqlalchemy_backblast.submitter_id = self.submitter_id
         sqlalchemy_backblast.submitter = self.submitter
+        sqlalchemy_backblast.team_id = self.team_id
 
         return sqlalchemy_backblast
 
@@ -139,10 +143,11 @@ class SqlAlchemyBackblast(Base):
     n_visiting_pax = Column(INTEGER)
     submitter_id = Column(String)
     submitter = Column(String)
+    team_id = Column(String)
 
     def get_backblast(self) -> Backblast:
         return Backblast(
-            self.store_date, self.date, self.q, self.q_id, self.ao, self.ao_id, self.summary, self.pax, self.pax_ids, self.fngs, self.fng_ids, self.pax_no_slack, self.n_visiting_pax, self.submitter_id, self.submitter, self.id
+            self.store_date, self.date, self.q, self.q_id, self.ao, self.ao_id, self.summary, self.pax, self.pax_ids, self.fngs, self.fng_ids, self.pax_no_slack, self.n_visiting_pax, self.submitter_id, self.submitter, self.team_id, self.id
         )
 
 

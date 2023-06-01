@@ -16,6 +16,8 @@ class SlackbotConfig:
         self.gcp_location = 'us-east1'
         self.gcp_queue_name = os.environ.get("BACKBLAST_QUEUE_NAME")
         self.handler_url = os.environ.get("BACKBLAST_HANDLER_URL")
+        # This will be set on a per-deployment basis for now, but if we had a multi-workspace app woudl come from interaction payloads
+        self.team_id = os.environ.get("SLACK_TEAM_ID")  
 
         # Default to empty, but expect a comma separated list of IDs
         self.paxmate_say_authorized_slack_ids = os.environ.get("PAXMATE_SAY_AUTHORIZED_SLACK_IDS", "").replace(" ", "").split(",")
@@ -70,6 +72,7 @@ def open_backblast_form(ack, client, command, logger):
     ack()
     trigger_id = command.get("trigger_id")
     user = command.get("user_id")
+    team = slackbot_config.team_id
     channel = command.get("channel_id")
     default_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -96,7 +99,7 @@ def open_backblast_form(ack, client, command, logger):
                     "text": "Cancel",
                     "emoji": True
                 },
-                "private_metadata": f'{{"initial_channel": {channel} }}',
+                "private_metadata": f'{"initial_channel": "{channel}", "team": "{team}"}',
                 # body of the view
                 "blocks": [
                     {
@@ -485,6 +488,7 @@ def _parse_backblast_body(body, logger):
         "n_visiting_pax": n_visiting_pax,
         "submitter_id": submitter_id,
         "submitter": submitter,
+        "team_id": slackbot_config.team_id,
         "id": uuid.uuid4().hex
     }
     logger.debug(f"Built backblast object: \n{json.dumps(backblast_data, indent=2)}")

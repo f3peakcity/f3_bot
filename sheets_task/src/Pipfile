@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+google-api-python-client = "==2.77.0"
+flask = "==2.2.4"
+sqlalchemy = "<2,>=1.4.25"
+psycopg2-binary = "==2.9.5"
+pyarrow = "==10.0.1"
+sqlalchemy-cockroachdb = "==1.4.4"
+slack-bolt = "==1.16.1"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
+python_full_version = "3.9.16"

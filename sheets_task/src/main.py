@@ -50,6 +50,7 @@ def f3_sheets_handler(request):
         n_visiting_pax=body.get("n_visiting_pax"),
         submitter_id=body.get("submitter_id"),
         submitter=body.get("submitter"),
+        team_id=body.get("team_id"),
         id=body.get("id")
     )
 
