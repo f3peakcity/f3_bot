@@ -16,8 +16,6 @@ on:
         required: true
         type: string
     secrets:
-      GCP_PROJECT:
-        required: true
       SLACKBOT_ENV_VARS:
         required: true
 
