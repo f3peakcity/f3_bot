@@ -57,7 +57,7 @@ def post_as_paxmate(ack, client, command, logger):
         client.chat_postEphemeral(
             channel=channel,
             # TODO(multi-tenant) look this up based on the list of slack ids
-            text="Sorry, only Wahoo and Clockwork have this power.",
+            text="Sorry, you don't have this power; please check with the Paxmate Admin.",
             user=user
         )
     else:
@@ -86,7 +86,7 @@ def open_backblast_form(ack, client, command, logger):
                     "type": "plain_text",
                     # TODO(multi-tenant) Add customization of this header.
                     # There is a 25 character limit.
-                    "text": "F3 Peak City PaxMate",
+                    "text": "F3 PaxMate",
                     "emoji": True
                 },
                 "submit": {

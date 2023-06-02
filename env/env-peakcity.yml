@@ -1,4 +1,4 @@
-PAXMATE_SAY_AUTHORIZED_SLACK_IDS: "U04A6QSSZPV,U046A6PJF5X"  # Red Ryder, Wahoo
+PAXMATE_SAY_AUTHORIZED_SLACK_IDS: "U04A6QSSZPV,U046A6PJF5X,U04FR32HU48"  # Red Ryder, Wahoo, Clockwork
 BACKBLAST_QUEUE_NAME: sheets-append-peakcity
 BACKBLAST_HANDLER_URL: "https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler-peakcity"
 SLACK_TEAM_ID: "T046M8F12U8"
