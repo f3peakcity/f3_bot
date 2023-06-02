@@ -1,4 +1,4 @@
-name: Deploy Green Level slackbot
+name: Deploy Green Level
 
 on:
   push:

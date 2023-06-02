@@ -1,3 +1,16 @@
+## Adding a new region
+
+1. Add a new github environment for the region, and add a secret called SLACKBOT_ENV_VARS using the format below.
+2. Add a new slack app for the region, using the mainfest file below; install the app in the region's workspace. You will need the signing secret and bot token.
+2. Add a new env file for the region in the `env` directory
+- The env file should be named `env-<region>.yml`
+- Look up the region's slack workspace id in the app installation section of `api.slack.com`
+- Look up the user ids for users who will be allowed to use `/paxmate say` by viewing their profile in slack and choosing "Copy Member ID"
+- Look up the channel ids for the 1st F and 3rd F channels
+- You can use the same spreadsheet id, or create a new one. If you create a new one, ensure that 
+f3-carpex@appspot.gserviceaccount.com has edit access to the sheet.
+3. Add a new deployment file for the region in the `.github/workflows` directory
+
 ### Relevant APIs need to be enabled
 
 - app engine function (https://console.developers.google.com/appengine)
@@ -40,18 +53,18 @@ Slack App Manifest
 
 ```
 display_information:
-  name: carpex
+  name: paxmate-NEWREGIONNAME
 features:
   bot_user:
-    display_name: carpex
+    display_name: paxmate-NEWREGIONNAME
     always_online: false
   slash_commands:
     - command: /backblast
-      url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot
+      url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot-NEWREGIONNAME
       description: Quick Backblast Builder
       should_escape: false
     - command: /paxmate
-      url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot
+      url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot-NEWREGIONNAME
       description: Post a message as paxmate
       usage_hint: say [message]
       should_escape: false
