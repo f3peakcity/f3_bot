@@ -1,12 +1,12 @@
 Deploy:
 
 ```
-gcloud functions deploy slackbot --region=us-east1  --allow-unauthenticated --trigger-http --runtime python39 --env-vars-file .env.yaml
+gcloud functions deploy slackbot --region=us-east1  --allow-unauthenticated --trigger-http --runtime python39 --env-vars-file env/env-development.yml
 ```
 
 SLACKBOT_ENV_VARS example:
 ```
-SLACK_BOT_TOKEN: xoxb-<>,SLACK_SIGNING_SECRET=donotshare,HANDLER_URL=https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler-develop,QUEUE_NAME=
+SLACK_BOT_TOKEN: xoxb-<>,SLACK_SIGNING_SECRET=donotshare
 ```
 
 Slack App Manifest

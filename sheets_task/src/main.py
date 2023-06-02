@@ -110,9 +110,8 @@ def post_messages(backblast_data):
 
     # Post in the channel(s)
     # TODO(multi-tenant) we'll need to look these up or provide a way for folks to configure it
-    first_f_channel = "C04F1C0HY2F"
-    third_f_channel = "C045XHF4MMG"
-    backblast_bot_test_channel = "C04H38NN2QG"
+    first_f_channel = os.environ.get("FIRST_F_CHANNEL")
+    third_f_channel = os.environ.get("THIRD_F_CHANNEL")
     ao_channel = backblast_data["ao_id"]
     if ao_channel is None or ao_channel == "":
         post_channels = {first_f_channel}
