@@ -1,3 +1,3 @@
-slack_bolt
-google-cloud-tasks
-flask
+slack_bolt==1.16.1
+google-cloud-tasks==2.12.1
+flask==2.2.4

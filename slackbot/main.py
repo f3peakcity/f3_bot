@@ -10,14 +10,22 @@ from google.cloud import tasks_v2
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
-client = tasks_v2.CloudTasksClient()
-project = 'f3-carpex'
-queue = os.environ.get("QUEUE_NAME", "sheets-append")
-location = 'us-east1'
-url = os.environ.get("HANDLER_URL", 'https://us-east1-f3-carpex.cloudfunctions.net/f3-sheets-handler')
-parent = client.queue_path(project, location, queue)
+class SlackbotConfig:
+    def __init__(self):
+        self.gcp_project = 'f3-carpex'
+        self.gcp_location = 'us-east1'
+        self.gcp_queue_name = os.environ.get("BACKBLAST_QUEUE_NAME")
+        self.handler_url = os.environ.get("BACKBLAST_HANDLER_URL")
+        # This will be set on a per-deployment basis for now, but if we had a multi-workspace app woudl come from interaction payloads
+        self.team_id = os.environ.get("SLACK_TEAM_ID")  
 
-PAXMATE_SAY_AUTHORIZED_SLACK_IDS = ["U8LBE9LTW", "UFZR843T6", "UFVJ1RZ2Q", "UAHPX7V1Q", "ULFRBEH0Q"]
+        # Default to empty, but expect a comma separated list of IDs
+        self.paxmate_say_authorized_slack_ids = os.environ.get("PAXMATE_SAY_AUTHORIZED_SLACK_IDS", "").replace(" ", "").split(",")
+
+slackbot_config = SlackbotConfig()
+
+client = tasks_v2.CloudTasksClient()
+parent = client.queue_path(slackbot_config.gcp_project, slackbot_config.gcp_location, slackbot_config.gcp_queue_name)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,7 +34,6 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
     process_before_response=True,
 )
-
 
 @app.command("/paxmate")
 def post_as_paxmate(ack, client, command, logger):
@@ -46,10 +53,11 @@ def post_as_paxmate(ack, client, command, logger):
     else:
         text = text[4:]
 
-    if user not in PAXMATE_SAY_AUTHORIZED_SLACK_IDS:
+    if user not in slackbot_config.paxmate_say_authorized_slack_ids:
         client.chat_postEphemeral(
             channel=channel,
-            text="Sorry, only Banjo has this power.",
+            # TODO(multi-tenant) look this up based on the list of slack ids
+            text="Sorry, you don't have this power; please check with the Paxmate Admin.",
             user=user
         )
     else:
@@ -64,6 +72,7 @@ def open_backblast_form(ack, client, command, logger):
     ack()
     trigger_id = command.get("trigger_id")
     user = command.get("user_id")
+    team = slackbot_config.team_id
     channel = command.get("channel_id")
     default_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -75,7 +84,9 @@ def open_backblast_form(ack, client, command, logger):
                 "callback_id": "backblast_modal",
                 "title": {
                     "type": "plain_text",
-                    "text": "F3 Carpex PAX Assistant",
+                    # TODO(multi-tenant) Add customization of this header.
+                    # There is a 25 character limit.
+                    "text": "F3 PaxMate",
                     "emoji": True
                 },
                 "submit": {
@@ -88,7 +99,7 @@ def open_backblast_form(ack, client, command, logger):
                     "text": "Cancel",
                     "emoji": True
                 },
-                "private_metadata": f'{{"initial_channel": {channel} }}',
+                "private_metadata": f'{{"initial_channel": "{channel}", "team": "{team}"}}',
                 # body of the view
                 "blocks": [
                     {
@@ -477,6 +488,7 @@ def _parse_backblast_body(body, logger):
         "n_visiting_pax": n_visiting_pax,
         "submitter_id": submitter_id,
         "submitter": submitter,
+        "team_id": slackbot_config.team_id,
         "id": uuid.uuid4().hex
     }
     logger.debug(f"Built backblast object: \n{json.dumps(backblast_data, indent=2)}")
@@ -508,11 +520,11 @@ def _add_data_to_queue(backblast_data, logger):
         task = {
             "http_request": {
                 "http_method": tasks_v2.HttpMethod.POST,
-                "url": url,
+                "url": slackbot_config.handler_url,
                 "headers": {"Content-type": "application/json"},
                 "body": converted_payload
             },
-            "name": client.task_path(project, location, queue, backblast_data.get("id", uuid.uuid4().hex))
+            "name": client.task_path(slackbot_config.gcp_project, slackbot_config.gcp_location, slackbot_config.gcp_queue_name, backblast_data.get("id", uuid.uuid4().hex))
         }
         response = client.create_task(request={"parent": parent, "task": task})
         logger.info(f"Created task {response.name}")
@@ -522,10 +534,10 @@ def _add_data_to_queue(backblast_data, logger):
 
 handler = SlackRequestHandler(app)
 
-
 def slackbot(request):
+    if request.method == "GET" and request.path == '/healthz':
+        logging.getLogger().info('Health check')
     return handler.handle(request)
-
 
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))

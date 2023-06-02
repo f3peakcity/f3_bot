@@ -12,11 +12,10 @@ on:
       slackbot_name:
         required: true
         type: string
+      env_vars_file:
+        required: true
+        type: string
     secrets:
-      GCP_SA_KEY:
-        required: true
-      GCP_PROJECT:
-        required: true
       SLACKBOT_ENV_VARS:
         required: true
 
@@ -25,15 +24,20 @@ jobs:
     name: Deploy Queue Handler
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+  
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - id: 'auth'
-      uses: 'google-github-actions/auth@v0'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
       with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        workload_identity_provider: 'projects/330812298791/locations/global/workloadIdentityPools/github/providers/github'
+        service_account: 'github-action-runner@f3-carpex.iam.gserviceaccount.com'
 
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v0'
@@ -47,20 +51,26 @@ jobs:
         region: us-east1
         source_dir: ./sheets_task/src
         env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
+        env_vars_file: ${{ inputs.env_vars_file }}
 
   deploy-slackbot:
     name: Deploy Slackbot
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - id: 'auth'
-      uses: 'google-github-actions/auth@v0'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
       with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        workload_identity_provider: 'projects/330812298791/locations/global/workloadIdentityPools/github/providers/github'
+        service_account: 'github-action-runner@f3-carpex.iam.gserviceaccount.com'
 
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v0'
@@ -74,3 +84,4 @@ jobs:
         region: us-east1
         source_dir: ./slackbot/
         env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
+        env_vars_file: ${{ inputs.env_vars_file }}
