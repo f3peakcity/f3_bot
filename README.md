@@ -27,4 +27,48 @@
 ### Development:
 
 Use the `develop` branch for development.
-The Pipfile supports development with `pipenv`.
+The Pipfile supports development with `pipenv` for each component individually.
+
+SLACKBOT_ENV_VARS example:
+```
+SLACK_BOT_TOKEN=xoxb-<>,SLACK_SIGNING_SECRET=donotshare,COCKROACH_CONNECTION_STRING=cockroachdb://<USERNAME>:<PASSWORD>@f3-bot-5101.5xj.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&sslrootcert=./root.crt
+```
+
+# Note the passing of sslrootcert as a connection string parameter. This is required for the CockroachDB Python driver to connect to the database.
+
+Slack App Manifest
+
+```
+display_information:
+  name: carpex
+features:
+  bot_user:
+    display_name: carpex
+    always_online: false
+  slash_commands:
+    - command: /backblast
+      url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot
+      description: Quick Backblast Builder
+      should_escape: false
+    - command: /paxmate
+      url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot
+      description: Post a message as paxmate
+      usage_hint: say [message]
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - channels:join
+      - channels:read
+      - chat:write
+      - commands
+      - users:read
+      - chat:write.customize
+settings:
+  interactivity:
+    is_enabled: true
+    request_url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
+```
