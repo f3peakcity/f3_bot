@@ -2,14 +2,16 @@
 
 1. Add a new github environment for the region, and add a secret called SLACKBOT_ENV_VARS using the format below.
 2. Add a new slack app for the region, using the mainfest file below; install the app in the region's workspace. You will need the signing secret and bot token.
-2. Add a new env file for the region in the `env` directory
+3. Add a new env file for the region in the `env` directory
 - The env file should be named `env-<region>.yml`
 - Look up the region's slack workspace id in the app installation section of `api.slack.com`
 - Look up the user ids for users who will be allowed to use `/paxmate say` by viewing their profile in slack and choosing "Copy Member ID"
 - Look up the channel ids for the 1st F and 3rd F channels
 - You can use the same spreadsheet id, or create a new one. If you create a new one, ensure that 
 f3-carpex@appspot.gserviceaccount.com has edit access to the sheet.
-3. Add a new deployment file for the region in the `.github/workflows` directory
+4. Add a new deployment file for the region in the `.github/workflows` directory
+5. Add AO Reference information to the AO Reference sheet in the spreadsheet (for data workflow)
+6. Update dashboard
 
 ### Relevant APIs need to be enabled
 
