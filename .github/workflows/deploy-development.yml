@@ -1,4 +1,4 @@
-name: Deploy Development slackbot
+name: Deploy Development Environment
 
 on:
   push:

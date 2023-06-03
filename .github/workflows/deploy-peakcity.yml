@@ -1,4 +1,4 @@
-name: Deploy peakcity slackbot
+name: Deploy Peak City
 
 on:
   push:

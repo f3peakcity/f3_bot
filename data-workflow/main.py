@@ -56,6 +56,10 @@ def add_day_of_week(df: pd.DataFrame, date_column: str = "date") -> pd.DataFrame
     new[f"{date_column}"] = new[f"{date_column}"] - pd.to_timedelta(date_diff, unit="d")
 
     new["day_of_week"] = new[f"{date_column}"].dt.day_name()
+    new["day_of_week_int_original"] = new["day_of_week_int"]
+    new["ao_day_of_week_int"] = new["ao_day_of_week_int"].fillna(new["day_of_week_int"])
+    new["day_of_week_int"] = new["ao_day_of_week_int"]
+
     return new
 
 def update_pax_names(df: pd.DataFrame) -> pd.DataFrame:
@@ -64,6 +68,10 @@ def update_pax_names(df: pd.DataFrame) -> pd.DataFrame:
     # use most recent name for each pax
     pax = df[["pax", "pax_id"]].drop_duplicates(subset=["pax_id"], keep="last")
     updated = df.merge(pax, on="pax_id", how="left", suffixes=("_then_name", ""))
+    qs = updated[["q", "q_id"]].drop_duplicates(subset=["q_id"], keep="last")
+    qs = qs[qs["q_id"].notnull()]
+    updated = updated.merge(qs, on="q_id", how="left", suffixes=("_then_name", ""))
+    updated["q"] = updated["q"].fillna(updated["q_then_name"])
     return updated
 
 def get_last_message_for_ao_q_day(df: pd.DataFrame) -> pd.DataFrame:
@@ -83,7 +91,7 @@ def get_df_as_list(df: pd.DataFrame, do_ao_rollup: bool = False) -> List[List[st
     new = df.fillna("_")
     # reorder and drop columns (drop the old name, 'pax_then_name')
     new = new.drop(columns=["pax_then_name"])
-    new = new[["date", "q", "ao", "n_pax", "pax", "day_of_week", "day_of_week_int", "pax_id", "n_fngs", "fng_id", "pax_no_slack", "n_visiting_pax", "ao_lat", "ao_lon", "submitter", "submitter_id", "id", "store_date"]]
+    new = new[["date", "q", "ao", "n_pax", "pax", "day_of_week", "day_of_week_int", "pax_id", "n_fngs", "fng_id", "pax_no_slack", "n_visiting_pax", "ao_lat", "ao_lon", "submitter", "submitter_id", "id", "store_date", "ao_region", "q_id"]]
     new["date"] = new["date"].apply(lambda x: x.strftime("%Y-%m-%d"))
     new["store_date"] = new["store_date"].apply(lambda x: x.strftime("%Y-%m-%dT%H:%M:%S.%f"))
     if do_ao_rollup:
@@ -92,13 +100,13 @@ def get_df_as_list(df: pd.DataFrame, do_ao_rollup: bool = False) -> List[List[st
         ao_level = ao_level.drop_duplicates(subset=["date", "q", "ao"], keep="last")
         values = ao_level.values.tolist()
         values = [
-            ["Date", "Q", "AO", "PAX (count)", "Day of Week", "Day of Week - Int", "FNGs (count)", "PAX Not in Slack", "Visitng PAX (count)", "ao_lat", "ao_lon", "Submitter", "Submitter ID", "Backblast ID", "Backblast Timestamp"],
+            ["Date", "Q", "AO", "PAX (count)", "Day of Week", "Day of Week - Int", "FNGs (count)", "PAX Not in Slack", "Visitng PAX (count)", "ao_lat", "ao_lon", "Submitter", "Submitter ID", "Backblast ID", "Backblast Timestamp", "Region ID", "Q Slack ID"],
             *values
         ]
     else:
         values = new.values.tolist()
         values = [
-            ["Date", "Q", "AO", "PAX (count)", "PAX Name", "Day of Week", "Day of Week - Int", "PAX Slack ID", "FNGs (count)", "FNG ID", "PAX Not in Slack", "Visitng PAX (count)", "ao_lat", "ao_lon", "Submitter", "Submitter ID", "Backblast ID", "Backblast Timestamp"],
+            ["Date", "Q", "AO", "PAX (count)", "PAX Name", "Day of Week", "Day of Week - Int", "PAX Slack ID", "FNGs (count)", "FNG ID", "PAX Not in Slack", "Visitng PAX (count)", "ao_lat", "ao_lon", "Submitter", "Submitter ID", "Backblast ID", "Backblast Timestamp", "Region ID", "Q Slack ID"],
             *values
         ]
     return values
