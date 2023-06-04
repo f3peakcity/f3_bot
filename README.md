@@ -82,7 +82,7 @@ oauth_config:
 settings:
   interactivity:
     is_enabled: true
-    request_url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot
+    request_url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot-NEWREGIONNAME
   org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false
