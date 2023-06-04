@@ -1,0 +1,17 @@
+name: Deploy Churham
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    uses: f3peakcity/f3_bot/.github/workflows/gcf.yml@main
+    with:
+      environment: churham
+      slackbot_name: slackbot-churham
+      queue_handler_name: f3-sheets-handler-churham
+      env_vars_file: ./env/env-churham.yml
+    secrets:
+      SLACKBOT_ENV_VARS: '${{ secrets.SLACKBOT_ENV_VARS }}'

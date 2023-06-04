@@ -55,7 +55,9 @@ Slack App Manifest
 
 ```
 display_information:
-  name: paxmate-NEWREGIONNAME
+  name: Paxmate NEWREGIONNAME
+  description: Build backblasts and track your workouts!
+  background_color: "#000000"
 features:
   bot_user:
     display_name: paxmate-NEWREGIONNAME
@@ -82,7 +84,7 @@ oauth_config:
 settings:
   interactivity:
     is_enabled: true
-    request_url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot
+    request_url: https://us-east1-f3-carpex.cloudfunctions.net/slackbot-NEWREGIONNAME
   org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false
