@@ -55,7 +55,9 @@ Slack App Manifest
 
 ```
 display_information:
-  name: paxmate-NEWREGIONNAME
+  name: Paxmate NEWREGIONNAME
+  description: Build backblasts and track your workouts!
+  background_color: "#000000"
 features:
   bot_user:
     display_name: paxmate-NEWREGIONNAME
