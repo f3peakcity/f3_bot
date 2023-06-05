@@ -407,12 +407,8 @@ def handle_backblast_submit(ack, body, logger):
     # We're doing it separately now because we don't want any latency to
     # delay the errors update, and in the normal parsing process we hit the slack api
     ao_id = None
-    # for val in values.values():
-    #     if "ao-select" in val:
-    #         ao_id = val["ao-select"].get("selected_channel", "")
     try:
-        logger.error(json.dumps(body))
-        ao_id = body["view"]["state"]["values"]["date-ao-q"]["ao-select"]["value"]
+        ao_id = body["view"]["state"]["values"]["date-ao-q"]["ao-select"]["selected_channel"]
     except KeyError:
         pass
     if ao_id is None or ao_id == "":
