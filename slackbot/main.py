@@ -105,6 +105,7 @@ def open_backblast_form(ack, client, command, logger):
                 "blocks": [
                     {
                         "type": "actions",
+                        "block_id": "date-ao-q",
                         "elements": [
                             {
                                 "type": "datepicker",
@@ -405,11 +406,15 @@ def handle_backblast_submit(ack, body, logger):
     # Validate data. Currently, this is validating that an AO was selected.
     # We're doing it separately now because we don't want any latency to
     # delay the errors update, and in the normal parsing process we hit the slack api
-    values = body.get("view", {}).get("state", {}).get("values", {})
     ao_id = None
-    for val in values.values():
-        if "ao-select" in val:
-            ao_id = val["ao-select"].get("selected_channel", "")
+    # for val in values.values():
+    #     if "ao-select" in val:
+    #         ao_id = val["ao-select"].get("selected_channel", "")
+    try:
+        logger.error(json.dumps(body, indent=2))
+        ao_id = body["view"]["state"]["values"]["date-ao-q"]["ao-select"]["value"]
+    except KeyError:
+        pass
     if ao_id is None or ao_id == "":
         errors = {"ao-select": "Please select an AO"}
         ack(response_action="errors", errors=errors)
