@@ -411,7 +411,7 @@ def handle_backblast_submit(ack, body, logger):
     #     if "ao-select" in val:
     #         ao_id = val["ao-select"].get("selected_channel", "")
     try:
-        logger.error(json.dumps(body, indent=2))
+        logger.error(json.dumps(body))
         ao_id = body["view"]["state"]["values"]["date-ao-q"]["ao-select"]["value"]
     except KeyError:
         pass
