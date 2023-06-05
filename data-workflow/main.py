@@ -1,7 +1,6 @@
 from typing import List
 
 import logging
-import os
 
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
@@ -157,7 +156,8 @@ def do_pipeline(sheet_id: str):
 
 
 if __name__ == "__main__":
-    print("Starting data workflow.")
-    sheet_id = os.environ.get("SPREADSHEET_ID", "1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
-    do_pipeline(sheet_id=sheet_id)
+    print("Starting data workflow for Carpex/Peak City/Green Level:")
+    do_pipeline(sheet_id="1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
+    print("Starting pipeline for Churham:")
+    do_pipeline(sheet_id="1W5ULRiVCjrnBZ1jiLFpwy3E1osQ-doRsdASGMKtZI7Y")
     print("Completed data workflow.")
