@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import time
+from flask import make_response
 
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
@@ -30,6 +31,10 @@ app = App(
 
 def f3_sheets_handler(request):
     global service
+
+    if request.method == "GET" and request.path.endswith("/healthz"):
+        print("health check")
+        return make_response(f'{{"status": "alive", "path": "{request.path}"}}', 200)
 
     start = time.time()
     body = request.get_json().get("body", {})

@@ -538,7 +538,7 @@ handler = SlackRequestHandler(app)
 def slackbot(request):
     if request.method == "GET" and request.path.endswith("/healthz"):
         print("health check")
-        return make_response('{"status": "alive", "path": "{request.path}"}', 200)
+        return make_response(f'{{"status": "alive", "path": "{request.path}"}}', 200)
     return handler.handle(request)
 
 if __name__ == "__main__":
