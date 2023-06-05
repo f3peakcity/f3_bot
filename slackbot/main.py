@@ -124,8 +124,6 @@ def open_backblast_form(ack, client, command, logger):
                                     "emoji": True
                                 },
                                 "action_id": "ao-select",
-                                # Mark this as required
-                                "optional": False
                                 # do not set an initial_channel since too many people left it as default (1st f)
                                 # "initial_channel": channel,
                             },
@@ -404,6 +402,18 @@ def edit_backblast(ack, body, logger):
 @app.view("backblast_modal")
 def handle_backblast_submit(ack, body, logger):
     start = time.time()
+    # Validate data. Currently, this is validating that an AO was selected.
+    # We're doing it separately now because we don't want any latency to
+    # delay the errors update, and in the normal parsing process we hit the slack api
+    values = body.get("view", {}).get("state", {}).get("values", {})
+    ao_id = None
+    for val in values.values():
+        if "ao-select" in val:
+            ao_id = val["ao-select"].get("selected_channel", "")
+    if ao_id is None or ao_id == "":
+        errors = {"ao-select": "Please select an AO"}
+        ack(response_action="errors", errors=errors)
+        return
     ack()
     backblast_data = _parse_backblast_body(body, logger)
     now = time.time()
