@@ -1,0 +1,20 @@
+name: Slackbot Warmup
+
+on:
+  # Every 7 minutes during peak workout hours
+  # Runtime is UTC, so adapt to Eastern Time
+  schedule:
+    - cron: "*/7 10,11 * * *"
+
+jobs:
+  warmup_slackbot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Warmup Slackbot
+        run: |
+          curl https://us-east1-f3-carpex.cloudfunctions.net/slackbot/healthz
+          curl https://us-east1-f3-carpex.cloudfunctions.net/slackbot-peakcity/healthz
+          curl https://us-east1-f3-carpex.cloudfunctions.net/slackbot-greenlevel/healthz
+          curl https://us-east1-f3-carpex.cloudfunctions.net/slackbot-churham/healthz

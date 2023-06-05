@@ -16,3 +16,7 @@
 .env
 .secret
 .idea
+
+Pipfile
+Pipfile.lock
+test_*.py
