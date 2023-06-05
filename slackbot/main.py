@@ -124,6 +124,8 @@ def open_backblast_form(ack, client, command, logger):
                                     "emoji": True
                                 },
                                 "action_id": "ao-select",
+                                # Mark this as required
+                                "optional": False
                                 # do not set an initial_channel since too many people left it as default (1st f)
                                 # "initial_channel": channel,
                             },
