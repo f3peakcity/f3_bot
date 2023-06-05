@@ -10,13 +10,17 @@
 - You can use the same spreadsheet id, or create a new one. If you create a new one, ensure that 
 f3-carpex@appspot.gserviceaccount.com has edit access to the sheet.
 4. Add a new deployment file for the region in the `.github/workflows` directory
-5. Add AO Reference information to the AO Reference sheet in the spreadsheet (for data workflow)
-6. Update dashboard
+5. Add a queue for the new region (`gcloud tasks queues create sheets-append-NEWREGIONNAME`)
+6. After the first deployment, manually update the permissions on *both* cloud functions for the new region (see: https://github.com/google-github-actions/deploy-cloud-functions#allowing-unauthenticated-requests and https://cloud.google.com/functions/docs/securing/managing-access-iam#after_deployment)
+7. Add AO Reference information to the AO Reference sheet in the spreadsheet (for data workflow)
+8. Update dashboard
 
-### Relevant APIs need to be enabled
+
+### Gcloud Project Prereqs: Relevant APIs need to be enabled
 
 - app engine function (https://console.developers.google.com/appengine)
-- cloud task queues (`gcloud tasks queues create sheets-append`)
+- Cloud Functions
+- Cloud Tasks
 
 ### OPPORTUNITIES TO EXCEL:
 
