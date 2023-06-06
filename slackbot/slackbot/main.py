@@ -15,7 +15,7 @@ class SlackbotConfig:
     def __init__(self):
         self.gcp_project = 'f3-carpex'
         self.gcp_location = 'us-east1'
-        self.gcp_queue_name = os.environ.get("BACKBLAST_QUEUE_NAME")
+        self.gcp_queue_name = os.environ.get("BACKBLAST_QUEUE_NAME", "")
         self.handler_url = os.environ.get("BACKBLAST_HANDLER_URL")
         # This will be set on a per-deployment basis for now, but if we had a multi-workspace app woudl come from interaction payloads
         self.team_id = os.environ.get("SLACK_TEAM_ID")  
@@ -142,6 +142,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "pax-select",
                         "dispatch_action": True,
                         "element": {
                             "type": "multi_users_select",
@@ -160,6 +161,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "summary",
                         "element": {
                             "type": "plain_text_input",
                             "multiline": True,
@@ -178,6 +180,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "fng-select",
                         "element": {
                             "type": "multi_users_select",
                             "placeholder": {
@@ -196,6 +199,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "pax-no-slack",
                         "element": {
                             "type": "plain_text_input",
                             "placeholder": {
@@ -213,6 +217,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "visiting-pax",
                         "element": {
                             "type": "static_select",
                             "placeholder": {
@@ -401,7 +406,7 @@ def edit_backblast(ack, body, logger):
 
 
 @app.view("backblast_modal")
-def handle_backblast_submit(ack, body, logger):
+def handle_backblast_submit(ack, body, logger) -> None:
     start = time.time()
     # Validate data. Currently, this is validating that an AO was selected.
     # We're doing it separately now because we don't want any latency to
@@ -412,7 +417,7 @@ def handle_backblast_submit(ack, body, logger):
     except KeyError:
         pass
     if ao_id is None or ao_id == "":
-        errors = {"ao-select": "Please select an AO"}
+        errors = {"date-ao-q": {"ao-select": "Please select an AO"}}
         ack(response_action="errors", errors=errors)
         return
     ack()

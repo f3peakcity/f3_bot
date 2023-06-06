@@ -1,8 +1,10 @@
 import pytest
+from unittest.mock import MagicMock, patch
 
+from slackbot.main import handle_backblast_submit, _parse_backblast_body
 
 @pytest.fixture
-def view_submission():
+def view_submission_no_ao():
     body = {
         "type": "view_submission",
         "team": {"id": "T04MU29F08G", "domain": "f3paxmatedev"},
@@ -57,7 +59,7 @@ def view_submission():
                 },
                 {
                     "type": "input",
-                    "block_id": "0X+",
+                    "block_id": "pax-select",
                     "label": {
                         "type": "plain_text",
                         "text": "Pax (1 selected)",
@@ -77,7 +79,7 @@ def view_submission():
                 },
                 {
                     "type": "input",
-                    "block_id": "aoXn",
+                    "block_id": "summary",
                     "label": {"type": "plain_text", "text": "Summary", "emoji": True},
                     "optional": True,
                     "dispatch_action": False,
@@ -97,7 +99,7 @@ def view_submission():
                 },
                 {
                     "type": "input",
-                    "block_id": "8Br",
+                    "block_id": "fng-select",
                     "label": {"type": "plain_text", "text": "FNGs", "emoji": True},
                     "optional": True,
                     "dispatch_action": False,
@@ -113,7 +115,7 @@ def view_submission():
                 },
                 {
                     "type": "input",
-                    "block_id": "HxZ",
+                    "block_id": "pax-no-slack",
                     "label": {
                         "type": "plain_text",
                         "text": "Additional Pax?",
@@ -136,7 +138,7 @@ def view_submission():
                 },
                 {
                     "type": "input",
-                    "block_id": "AW0kl",
+                    "block_id": "visiting-pax",
                     "label": {
                         "type": "plain_text",
                         "text": "Visiting PAX",
@@ -263,25 +265,25 @@ def view_submission():
                             "selected_user": "U04P1JJT2G6",
                         },
                     },
-                    "0X+": {
+                    "pax-select": {
                         "pax-select": {
                             "type": "multi_users_select",
                             "selected_users": ["U04P1JJT2G6"],
                         }
                     },
-                    "aoXn": {
+                    "summary": {
                         "summary": {"type": "plain_text_input", "value": "asdfsad"}
                     },
-                    "8Br": {
+                    "fng-select": {
                         "fng-select": {
                             "type": "multi_users_select",
                             "selected_users": [],
                         }
                     },
-                    "HxZ": {
+                    "pax-no-slack": {
                         "pax-no-slack": {"type": "plain_text_input", "value": None}
                     },
-                    "AW0kl": {
+                    "visiting-pax": {
                         "visiting-pax": {
                             "type": "static_select",
                             "selected_option": None,
@@ -307,3 +309,27 @@ def view_submission():
         "enterprise": None,
     }
     return body
+
+@patch("slackbot.main.app")
+@patch("slackbot.main.json")
+def test_parse_backblast_body(mock_json, mock_app, view_submission_no_ao):
+    mock_logger = MagicMock()
+    body = _parse_backblast_body(view_submission_no_ao, mock_logger)
+    assert body["date"] == "2023-06-05"
+    assert mock_app.client.conversations_info.call_count == 1
+    assert mock_json.dumps.call_count == 1
+    assert mock_logger.error.call_args_list == []
+    assert mock_logger.info.call_count == 0
+    assert mock_logger.error.call_count == 0
+
+
+
+def test_handle_backblast_submission(view_submission_no_ao):
+    ack = MagicMock()
+    body = view_submission_no_ao
+    logger = MagicMock()
+    with patch("slackbot.main.client") as mock_task_queue_client:
+        handle_backblast_submit(ack, body, logger)
+    assert ack.call_count == 1
+    ack.assert_called_once_with(response_action="errors", errors={"date-ao-q": {"ao-select": "Please select an AO"}})
+
