@@ -417,7 +417,7 @@ def handle_backblast_submit(ack, body, logger) -> None:
     except KeyError:
         pass
     if ao_id is None or ao_id == "":
-        errors = {"date-ao-q": {"ao-select": "Please select an AO"}}
+        errors = {"summary": "Please select an AO"}
         ack(response_action="errors", errors=errors)
         return
     ack()
