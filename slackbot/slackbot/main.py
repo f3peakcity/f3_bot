@@ -417,7 +417,7 @@ def handle_backblast_submit(ack, body, logger) -> None:
     except KeyError:
         pass
     if ao_id is None or ao_id == "":
-        errors = {"summary": "Please select an AO"}
+        errors = {"pax-select": "Please select an AO above for your backblast."}
         ack(response_action="errors", errors=errors)
         return
     ack()
