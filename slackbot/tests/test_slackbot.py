@@ -7,19 +7,19 @@ from slackbot.main import handle_backblast_submit, _parse_backblast_body
 def view_submission_no_ao():
     body = {
         "type": "view_submission",
-        "team": {"id": "T04MU29F08G", "domain": "f3paxmatedev"},
+        "team": {"id": "Tisateamid", "domain": "f3paxmatedev"},
         "user": {
-            "id": "U04P1JJT2G6",
-            "username": "james.p.campbell",
-            "name": "james.p.campbell",
-            "team_id": "T04MU29F08G",
+            "id": "Uisauserid",
+            "username": "jcampbelldev",
+            "name": "jcampbelldev",
+            "team_id": "Tisateamid",
         },
-        "api_app_id": "A04RXQ9EGF9",
-        "token": "9M9y7aCxfuIhC44h8iTLgwGM",
-        "trigger_id": "5378395399268.4742077510288.ceb1415e92a3cbbf8059930fb65cb2ea",
+        "api_app_id": "Aappid9",
+        "token": "imatoken",
+        "trigger_id": "5378395399268.4742077510288.isnotevenarealtriggerid",
         "view": {
-            "id": "V05BRKL20GY",
-            "team_id": "T04MU29F08G",
+            "id": "Visaviewid",
+            "team_id": "Tisateamid",
             "type": "modal",
             "blocks": [
                 {
@@ -48,7 +48,7 @@ def view_submission_no_ao():
                         {
                             "type": "users_select",
                             "action_id": "q-select",
-                            "initial_user": "U04P1JJT2G6",
+                            "initial_user": "Uisauserid",
                             "placeholder": {
                                 "type": "plain_text",
                                 "text": "Select Q",
@@ -247,7 +247,7 @@ def view_submission_no_ao():
                     },
                 },
             ],
-            "private_metadata": '{"initial_channel": "C04V4E61LN8", "team": "T04MU29F08G"}',
+            "private_metadata": '{"initial_channel": "Cisachannelid", "team": "Tisateamid"}',
             "callback_id": "backblast_modal",
             "state": {
                 "values": {
@@ -262,13 +262,13 @@ def view_submission_no_ao():
                         },
                         "q-select": {
                             "type": "users_select",
-                            "selected_user": "U04P1JJT2G6",
+                            "selected_user": "Uisauserid",
                         },
                     },
                     "pax-select": {
                         "pax-select": {
                             "type": "multi_users_select",
-                            "selected_users": ["U04P1JJT2G6"],
+                            "selected_users": ["Uisauserid"],
                         }
                     },
                     "summary": {
@@ -298,11 +298,11 @@ def view_submission_no_ao():
             "close": {"type": "plain_text", "text": "Cancel", "emoji": True},
             "submit": {"type": "plain_text", "text": "Submit", "emoji": True},
             "previous_view_id": None,
-            "root_view_id": "V05BRKL20GY",
-            "app_id": "A04RXQ9EGF9",
+            "root_view_id": "Visaviewid",
+            "app_id": "Aappid9",
             "external_id": "",
-            "app_installed_team_id": "T04MU29F08G",
-            "bot_id": "B04S5NJ83PY",
+            "app_installed_team_id": "Tisateamid",
+            "bot_id": "Bisabotid",
         },
         "response_urls": [],
         "is_enterprise_install": False,
