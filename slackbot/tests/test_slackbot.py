@@ -331,5 +331,5 @@ def test_handle_backblast_submission(view_submission_no_ao):
     with patch("slackbot.main.client") as mock_task_queue_client:
         handle_backblast_submit(ack, body, logger)
     assert ack.call_count == 1
-    ack.assert_called_once_with(response_action="errors", errors={"date-ao-q": {"ao-select": "Please select an AO"}})
+    ack.assert_called_once_with(response_action="errors", errors={"pax-select": "Please select an AO above for your backblast."})
 
