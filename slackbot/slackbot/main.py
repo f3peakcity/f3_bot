@@ -417,6 +417,9 @@ def handle_backblast_submit(ack, body, logger) -> None:
     except KeyError:
         pass
     if ao_id is None or ao_id == "":
+        # We cannot put the error message on the channel select because it is not an "input"
+        # type object. This seems like a slack limitation (see: 
+        # https://stackoverflow.com/questions/60220290/how-to-display-validation-errors-about-non-input-blocks-in-slack-modals)
         errors = {"pax-select": "Please select an AO above for your backblast."}
         ack(response_action="errors", errors=errors)
         return
@@ -555,7 +558,6 @@ handler = SlackRequestHandler(app)
 
 def slackbot(request):
     if request.method == "GET" and request.path.endswith("/healthz"):
-        print("health check")
         return make_response(f'{{"status": "alive", "path": "{request.path}"}}', 200)
     return handler.handle(request)
 

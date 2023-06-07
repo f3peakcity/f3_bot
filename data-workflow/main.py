@@ -1,12 +1,39 @@
-from typing import List
+import os
+from typing import List, Optional, Union
 
 import logging
 
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 import pandas as pd
+from sqlalchemy import create_engine, select, table, column
 
 logger = logging.getLogger()
+
+def get_raw_data_db(include_team_ids: List[Union[str, None]]) -> pd.DataFrame:
+    """Get raw data from the database and load to pandas for processing."""
+    column_names = ["date", "q", "ao", "ao_id", "n_pax", "pax", "pax_ids", "n_fngs", "fngs", "fng_ids", "pax_no_slack", "n_visiting_pax", "submitter", "submitter_id", "id", "store_date", "q_id", "team_id"]
+    column_select = [column(name) for name in column_names]
+    query = select(*column_select).select_from(table("backblast"))
+    exclude_null = True
+    if None in include_team_ids:
+        exclude_null = False
+    include_team_ids = [team_id for team_id in include_team_ids if team_id is not None]
+    if include_team_ids:
+        query = query.where(column("team_id").in_(include_team_ids))
+    if exclude_null:
+        query = query.where(column("team_id").isnot(None))
+
+    engine = create_engine(os.environ['COCKROACH_CONNECTION_STRING'])
+
+    df = pd.read_sql(query, con=engine, parse_dates=["date", "store_date"])
+
+    # Explode the list columns (largely a legacy of the google sheets implementation)
+    new = df.explode(['pax', 'pax_ids'])
+    new = new.explode(['fngs', 'fng_ids'])
+    new.rename(columns={"pax_ids": "pax_id", "fngs": "fng", "fng_ids": "fng_id"}, inplace=True)
+
+    return new
 
 def get_raw_data(sheet_id: str, sheet_name: str = "__RAW") -> pd.DataFrame:
     """Get raw data from the spreadsheet and load to pandas for processing.
@@ -18,9 +45,23 @@ def get_raw_data(sheet_id: str, sheet_name: str = "__RAW") -> pd.DataFrame:
 
 def get_reference_ao_data(sheet_id, sheet_name: str = "__REFERENCE_AO_INFO") -> pd.DataFrame:
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
-    column_names = ["ao", "ao_normalized_name", "ao_type", "ao_region", "ao_day_of_week_int", "ao_lat", "ao_lon"]
-    df = pd.read_csv(url, names=column_names, header=0)
+    column_names = ["ao", "ao_normalized_name", "ao_type", "ao_region", "ao_day_of_week_int", "ao_lat", "ao_lon", "ao_day_of_week"]
+    df = pd.read_csv(url, names=column_names, header=0, dtype={
+        "ao": str,
+        "ao_normalized_name": str,
+        "ao_type": str,
+        "ao_region": str,
+        "ao_day_of_week_int": float,
+        "ao_lat": float,
+        "ao_lon": float,
+        "ao_day_of_week": str
+    })
     df["ao_day_of_week_int"] = df["ao_day_of_week_int"].astype(float)
+    return df
+
+def get_reference_ao_data_db(team_name: str) -> pd.DataFrame:
+    engine = create_engine(os.environ['COCKROACH_CONNECTION_STRING'])
+    df = pd.read_sql_table(f"ao_info_{team_name}", con=engine)
     return df
 
 def infer_ao_info(df: pd.DataFrame, reference_ao_df: pd.DataFrame) -> pd.DataFrame:
@@ -85,19 +126,26 @@ def filter_by_ao_type(df: pd.DataFrame, ao_type: str = "1stf") -> pd.DataFrame:
     new = df.loc[df["ao_type"] == ao_type]
     return new
 
-def get_df_as_list(df: pd.DataFrame, do_ao_rollup: bool = False) -> List[List[str]]:
-    """Convert to a list of values to submit back to google sheets."""
-    new = df.fillna("_")
+def get_final_df(df: pd.DataFrame, do_ao_rollup: bool = False) -> pd.DataFrame:
     # reorder and drop columns (drop the old name, 'pax_then_name')
-    new = new.drop(columns=["pax_then_name"])
+    new = df.drop(columns=["pax_then_name"])
     new = new[["date", "q", "ao", "n_pax", "pax", "day_of_week", "day_of_week_int", "pax_id", "n_fngs", "fng_id", "pax_no_slack", "n_visiting_pax", "ao_lat", "ao_lon", "submitter", "submitter_id", "id", "store_date", "ao_region", "q_id"]]
-    new["date"] = new["date"].apply(lambda x: x.strftime("%Y-%m-%d"))
-    new["store_date"] = new["store_date"].apply(lambda x: x.strftime("%Y-%m-%dT%H:%M:%S.%f"))
     if do_ao_rollup:
         # rollup by AO
         ao_level = new.drop(columns=["pax", "pax_id", "fng_id"])
         ao_level = ao_level.drop_duplicates(subset=["date", "q", "ao"], keep="last")
-        values = ao_level.values.tolist()
+        return ao_level
+    return new
+
+def get_df_as_list(df: pd.DataFrame) -> List[List[str]]:
+    """Convert to a list of values to submit back to google sheets."""
+    new = df.fillna("_")
+    # reorder and drop columns (drop the old name, 'pax_then_name')
+    new["date"] = new["date"].apply(lambda x: x.strftime("%Y-%m-%d"))
+    new["store_date"] = new["store_date"].apply(lambda x: x.strftime("%Y-%m-%dT%H:%M:%S.%f"))
+    # TODO: this is brittle both in how it detects columns and the column name/order
+    if "pax" not in new.columns:
+        values = new.values.tolist()
         values = [
             ["Date", "Q", "AO", "PAX (count)", "Day of Week", "Day of Week - Int", "FNGs (count)", "PAX Not in Slack", "Visitng PAX (count)", "ao_lat", "ao_lon", "Submitter", "Submitter ID", "Backblast ID", "Backblast Timestamp", "Region ID", "Q Slack ID"],
             *values
@@ -149,15 +197,56 @@ def do_pipeline(sheet_id: str):
     df = update_pax_names(df)
     df = get_last_message_for_ao_q_day(df)
     df = filter_by_ao_type(df, ao_type="1stf")
-    pax_level_values = get_df_as_list(df, do_ao_rollup=False)
-    ao_level_values = get_df_as_list(df, do_ao_rollup=True)
+    pax_level_values = get_final_df(df, do_ao_rollup=False)
+    ao_level_values = get_final_df(df, do_ao_rollup=True)
+    pax_level_values = get_df_as_list(pax_level_values)
+    ao_level_values = get_df_as_list(ao_level_values)
     save_processed_values(sheet_id=sheet_id, sheet_suffix="PAX", values=pax_level_values)
     save_processed_values(sheet_id=sheet_id, sheet_suffix="AO", values=ao_level_values)
 
+def do_pipeline_db(team_name: str, team_ids: List[Union[str, None]]) -> None:
+    df = get_raw_data_db(include_team_ids=team_ids)
+    reference_ao_df = get_reference_ao_data_db(team_name=team_name)
+    df = infer_ao_info(df, reference_ao_df)
+    df = add_day_of_week(df)
+    df = update_pax_names(df)
+    df = get_last_message_for_ao_q_day(df)
+    df = filter_by_ao_type(df, ao_type="1stf")
+    pax_level_values = get_final_df(df, do_ao_rollup=False)
+    ao_level_values = get_final_df(df, do_ao_rollup=True)
+
+    engine = create_engine(os.environ['COCKROACH_CONNECTION_STRING'])
+
+    ao_level_values.to_sql(f"ao_level_values_{team_name}", con=engine, if_exists="replace")
+    pax_level_values.to_sql(f"pax_level_values_{team_name}", con=engine, if_exists="replace")
 
 if __name__ == "__main__":
-    print("Starting data workflow for Carpex/Peak City/Green Level:")
+    print("Starting sheets-based data workflow for Carpex/Peak City/Green Level:")
     do_pipeline(sheet_id="1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
-    print("Starting pipeline for Churham:")
-    do_pipeline(sheet_id="1W5ULRiVCjrnBZ1jiLFpwy3E1osQ-doRsdASGMKtZI7Y")
     print("Completed data workflow.")
+
+    # Updating AO info is taking a REALLY long time -- using the sheets API in general is really slow today
+    do_update_ao_info = False
+    if do_update_ao_info:
+        # Update reference AO data in the database
+        engine = create_engine(os.environ['COCKROACH_CONNECTION_STRING'])
+        try:
+            ao_data = get_reference_ao_data(sheet_id="1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
+            for team_name in ["carpex_super_region", "carpex", "greenlevel", "peakcity"]:
+                ao_data.to_sql(f"ao_info_{team_name}", con=engine, if_exists="replace", index=False)
+        except TimeoutError:
+            print("Timeout error updating reference AO data in the database. Continuing.")
+
+        try:
+            ao_data = get_reference_ao_data(sheet_id="1W5ULRiVCjrnBZ1jiLFpwy3E1osQ-doRsdASGMKtZI7Y")
+            for team_name in ["churham"]:
+                ao_data.to_sql(f"ao_info_{team_name}", con=engine, if_exists="replace", index=False)
+        except TimeoutError:
+            print("Timeout error updating reference AO data in the database. Continuing.")
+
+
+    do_pipeline_db("churham", ["T4GNGR79U"])
+    do_pipeline_db("carpex_super_region", [None, "T86PHS6VB", "T04GS2ZJBHD", "T046M8F12U8"])
+    do_pipeline_db("carpex", ["T86PHS6VB"])
+    do_pipeline_db("greenlevel", ["T04GS2ZJBHD"])
+    do_pipeline_db("peakcity", ["T046M8F12U8"])
