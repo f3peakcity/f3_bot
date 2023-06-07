@@ -40,7 +40,24 @@ def get_raw_data(sheet_id: str, sheet_name: str = "__RAW") -> pd.DataFrame:
     Manually specify the column names based on knowledge of the backblast format."""
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
     column_names = ["date", "q", "ao", "n_pax", "pax", "pax_id", "n_fngs", "fng_id", "pax_no_slack", "n_visiting_pax", "submitter", "submitter_id", "id", "store_date", "q_id", "team_id"]
-    df = pd.read_csv(url, names=column_names, parse_dates=["date", "store_date"])
+    df = pd.read_csv(url, names=column_names, parse_dates=["date", "store_date"], dtype={
+        "date": str,
+        "q": str,
+        "ao": str,
+        "n_pax": float,
+        "pax": str,
+        "pax_id": str,
+        "n_fngs": float,
+        "fng_id": str,
+        "pax_no_slack": str,
+        "n_visiting_pax": float,
+        "submitter": str,
+        "submitter_id": str,
+        "id": str,
+        "store_date": str,
+        "q_id": str,
+        "team_id": str
+    })
     return df
 
 def get_reference_ao_data(sheet_id, sheet_name: str = "__REFERENCE_AO_INFO") -> pd.DataFrame:
@@ -221,9 +238,11 @@ def do_pipeline_db(team_name: str, team_ids: List[Union[str, None]]) -> None:
     pax_level_values.to_sql(f"pax_level_values_{team_name}", con=engine, if_exists="replace")
 
 if __name__ == "__main__":
-    print("Starting sheets-based data workflow for Carpex/Peak City/Green Level:")
-    do_pipeline(sheet_id="1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
-    print("Completed data workflow.")
+    do_sheets_workflow = False
+    if do_sheets_workflow:
+        print("Starting sheets-based data workflow for Carpex/Peak City/Green Level:")
+        do_pipeline(sheet_id="1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
+        print("Completed data workflow.")
 
     # Updating AO info is taking a REALLY long time -- using the sheets API in general is really slow today
     do_update_ao_info = False
@@ -244,9 +263,15 @@ if __name__ == "__main__":
         except TimeoutError:
             print("Timeout error updating reference AO data in the database. Continuing.")
 
-
+    # Update the processed data in the database
+    print("starting database-based workflow for Churham")
     do_pipeline_db("churham", ["T4GNGR79U"])
+    print("starting database-based workflow for Carpex Super Region")
     do_pipeline_db("carpex_super_region", [None, "T86PHS6VB", "T04GS2ZJBHD", "T046M8F12U8"])
+    print("starting database-based workflow for Carpex")
     do_pipeline_db("carpex", ["T86PHS6VB"])
+    print("starting database-based workflow for Green Level")
     do_pipeline_db("greenlevel", ["T04GS2ZJBHD"])
+    print("starting database-based workflow for Peak City")
     do_pipeline_db("peakcity", ["T046M8F12U8"])
+    print("Completed database-based workflow.")
