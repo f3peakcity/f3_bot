@@ -242,6 +242,8 @@ if __name__ == "__main__":
         print("Starting sheets-based data workflow for Carpex/Peak City/Green Level:")
         do_pipeline(sheet_id="1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
         print("Completed data workflow.")
+    else:
+        print("Skipping sheets-based data workflow.")
 
     # Updating AO info is taking a REALLY long time -- using the sheets API in general is really slow today
     do_update_ao_info = os.environ.get("DO_UPDATE_AO_INFO", "false").lower() == "true"
@@ -262,6 +264,8 @@ if __name__ == "__main__":
             ao_data.to_sql(f"ao_info_{team_name}", con=engine, if_exists="replace", index=False)
         except TimeoutError:
             print("Timeout error updating reference AO data in the database. Continuing.")
+    else:
+        print("Skipping update of reference AO data in the database.")
 
     # Update the processed data in the database
     print("starting database-based workflow for Churham")
