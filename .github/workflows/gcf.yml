@@ -41,6 +41,10 @@ jobs:
 
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v0'
+    
+    - name: Add cockroachdb cert to src folder
+      run: |
+        cp ./root.crt ./sheets_task/src/root.crt
 
     - name: Deploy Queue Handler
       uses: google-github-actions/deploy-cloud-functions@main
