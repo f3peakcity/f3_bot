@@ -49,6 +49,7 @@ jobs:
       DO_SHEETS_WORKFLOW: false
       DO_UPDATE_AO_INFO: true
       GX_CLOUD_ACCESS_TOKEN: ${{ secrets.GX_CLOUD_ACCESS_TOKEN }}
+      GX_CLOUD_ORGANIZATION_ID: ${{ vars.GX_CLOUD_ORGANIZATION_ID }}
     steps:
       - uses: actions/checkout@v3
       - id: 'auth'
