@@ -64,16 +64,15 @@ def get_reference_ao_data(sheet_id, sheet_name: str = "__REFERENCE_AO_INFO") -> 
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
     column_names = ["ao", "ao_normalized_name", "ao_type", "ao_region", "ao_day_of_week_int", "ao_lat", "ao_lon", "ao_day_of_week"]
     df = pd.read_csv(url, names=column_names, header=0, dtype={
-        "ao": str,
-        "ao_normalized_name": str,
-        "ao_type": str,
-        "ao_region": str,
-        "ao_day_of_week_int": float,
-        "ao_lat": float,
-        "ao_lon": float,
-        "ao_day_of_week": str
+        "ao": pd.StringDtype(),
+        "ao_normalized_name": pd.StringDtype(),
+        "ao_type": pd.StringDtype(),
+        "ao_region": pd.StringDtype(),
+        "ao_day_of_week_int": pd.Float64Dtype(),
+        "ao_lat": pd.Float64Dtype(),
+        "ao_lon": pd.Float64Dtype(),
+        "ao_day_of_week": pd.StringDtype()
     })
-    df["ao_day_of_week_int"] = df["ao_day_of_week_int"].astype(float)
     return df
 
 def get_reference_ao_data_db(team_name: str) -> pd.DataFrame:
@@ -234,20 +233,21 @@ def do_pipeline_db(team_name: str, team_ids: List[Union[str, None]]) -> None:
 
     engine = create_engine(os.environ['COCKROACH_CONNECTION_STRING'])
 
-    ao_level_values.to_sql(f"ao_level_values_{team_name}", con=engine, if_exists="replace")
-    pax_level_values.to_sql(f"pax_level_values_{team_name}", con=engine, if_exists="replace")
+    ao_level_values.to_sql(f"ao_level_values_{team_name}", con=engine, if_exists="replace", index=False)
+    pax_level_values.to_sql(f"pax_level_values_{team_name}", con=engine, if_exists="replace", index=False)
 
 if __name__ == "__main__":
-    do_sheets_workflow = False
+    do_sheets_workflow = os.environ.get("DO_SHEETS_WORKFLOW", "false").lower() == "true"
     if do_sheets_workflow:
         print("Starting sheets-based data workflow for Carpex/Peak City/Green Level:")
         do_pipeline(sheet_id="1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
         print("Completed data workflow.")
 
     # Updating AO info is taking a REALLY long time -- using the sheets API in general is really slow today
-    do_update_ao_info = False
+    do_update_ao_info = os.environ.get("DO_UPDATE_AO_INFO", "false").lower() == "true"
     if do_update_ao_info:
         # Update reference AO data in the database
+        print("Updating reference AO data in the database.")
         engine = create_engine(os.environ['COCKROACH_CONNECTION_STRING'])
         try:
             ao_data = get_reference_ao_data(sheet_id="1c1vvx07AXdnu6NSa4is4a0oyUiu8q3cgOecFbTNWlAY")
@@ -258,8 +258,8 @@ if __name__ == "__main__":
 
         try:
             ao_data = get_reference_ao_data(sheet_id="1W5ULRiVCjrnBZ1jiLFpwy3E1osQ-doRsdASGMKtZI7Y")
-            for team_name in ["churham"]:
-                ao_data.to_sql(f"ao_info_{team_name}", con=engine, if_exists="replace", index=False)
+            team_name = "churham"
+            ao_data.to_sql(f"ao_info_{team_name}", con=engine, if_exists="replace", index=False)
         except TimeoutError:
             print("Timeout error updating reference AO data in the database. Continuing.")
 

@@ -30,3 +30,31 @@ jobs:
       - name: Run Workflow
         run: |
           python data-workflow/main.py
+  data_validation:
+    runs-on: ubuntu-latest
+    # Add "id-token" with the intended permissions.
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    env:
+      DO_SHEETS_WORKFLOW: false
+      DO_UPDATE_AO_INFO: true
+    steps:
+      - uses: actions/checkout@v3
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/330812298791/locations/global/workloadIdentityPools/github/providers/github'
+          service_account: 'github-action-runner@f3-carpex.iam.gserviceaccount.com'
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r data-validation/requirements.txt
+      - name: Run Workflow
+        run: |
+          python data-validation/main.py
