@@ -30,6 +30,7 @@ jobs:
       - name: Run Workflow
         run: |
           python data-workflow/main.py
+  
   data_validation:
     runs-on: ubuntu-latest
     # Add "id-token" with the intended permissions.
