@@ -9,6 +9,9 @@ on:
 jobs:
   data_workflow:
     runs-on: ubuntu-latest
+    environment: "data-workflow"
+    env:
+      COCKROACH_CONNECTION_STRING: ${{ secrets.COCKROACH_CONNECTION_STRING }}
     # Add "id-token" with the intended permissions.
     permissions:
       contents: 'read'
@@ -31,17 +34,19 @@ jobs:
           pip install -r data-workflow/requirements.txt
       - name: Run Workflow
         run: |
-          python data-workflow/main.py
   
   data_validation:
     runs-on: ubuntu-latest
+    environment: "data-workflow"
     # Add "id-token" with the intended permissions.
     permissions:
       contents: 'read'
       id-token: 'write'
     env:
+      COCKROACH_CONNECTION_STRING: ${{ secrets.COCKROACH_CONNECTION_STRING }}
       DO_SHEETS_WORKFLOW: false
       DO_UPDATE_AO_INFO: true
+      GX_CLOUD_ACCESS_TOKEN: ${{ secrets.GX_CLOUD_ACCESS_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - id: 'auth'
