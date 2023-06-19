@@ -34,8 +34,10 @@ jobs:
           pip install -r data-workflow/requirements.txt
       - name: Run Workflow
         run: |
+          python data-workflow/main.py
   
   data_validation:
+    needs: data_workflow
     runs-on: ubuntu-latest
     environment: "data-workflow"
     # Add "id-token" with the intended permissions.
