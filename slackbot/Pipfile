@@ -9,6 +9,9 @@ google-cloud-tasks = "==2.12.1"
 flask = "==2.2.4"
 
 [dev-packages]
+pytest = "*"
+black = "*"
+ruff = "*"
 
 [requires]
 python_version = "3.9"

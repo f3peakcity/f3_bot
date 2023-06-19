@@ -106,6 +106,7 @@ class Backblast():
         sqlalchemy_backblast.q = self.q
         sqlalchemy_backblast.q_id = self.q_id
         sqlalchemy_backblast.ao = self.ao
+        sqlalchemy_backblast.ao_id = self.ao_id
         sqlalchemy_backblast.summary = self.summary
         sqlalchemy_backblast.n_pax = self.n_pax
         sqlalchemy_backblast.pax = self.pax

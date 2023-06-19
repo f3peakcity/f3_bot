@@ -15,7 +15,7 @@ class SlackbotConfig:
     def __init__(self):
         self.gcp_project = 'f3-carpex'
         self.gcp_location = 'us-east1'
-        self.gcp_queue_name = os.environ.get("BACKBLAST_QUEUE_NAME")
+        self.gcp_queue_name = os.environ.get("BACKBLAST_QUEUE_NAME", "")
         self.handler_url = os.environ.get("BACKBLAST_HANDLER_URL")
         # This will be set on a per-deployment basis for now, but if we had a multi-workspace app woudl come from interaction payloads
         self.team_id = os.environ.get("SLACK_TEAM_ID")  
@@ -105,6 +105,7 @@ def open_backblast_form(ack, client, command, logger):
                 "blocks": [
                     {
                         "type": "actions",
+                        "block_id": "date-ao-q",
                         "elements": [
                             {
                                 "type": "datepicker",
@@ -141,6 +142,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "pax-select",
                         "dispatch_action": True,
                         "element": {
                             "type": "multi_users_select",
@@ -159,6 +161,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "summary",
                         "element": {
                             "type": "plain_text_input",
                             "multiline": True,
@@ -177,6 +180,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "fng-select",
                         "element": {
                             "type": "multi_users_select",
                             "placeholder": {
@@ -195,6 +199,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "pax-no-slack",
                         "element": {
                             "type": "plain_text_input",
                             "placeholder": {
@@ -212,6 +217,7 @@ def open_backblast_form(ack, client, command, logger):
                     },
                     {
                         "type": "input",
+                        "block_id": "visiting-pax",
                         "element": {
                             "type": "static_select",
                             "placeholder": {
@@ -400,8 +406,23 @@ def edit_backblast(ack, body, logger):
 
 
 @app.view("backblast_modal")
-def handle_backblast_submit(ack, body, logger):
+def handle_backblast_submit(ack, body, logger) -> None:
     start = time.time()
+    # Validate data. Currently, this is validating that an AO was selected.
+    # We're doing it separately now because we don't want any latency to
+    # delay the errors update, and in the normal parsing process we hit the slack api
+    ao_id = None
+    try:
+        ao_id = body["view"]["state"]["values"]["date-ao-q"]["ao-select"]["selected_channel"]
+    except KeyError:
+        pass
+    if ao_id is None or ao_id == "":
+        # We cannot put the error message on the channel select because it is not an "input"
+        # type object. This seems like a slack limitation (see: 
+        # https://stackoverflow.com/questions/60220290/how-to-display-validation-errors-about-non-input-blocks-in-slack-modals)
+        errors = {"pax-select": "Please select an AO above for your backblast."}
+        ack(response_action="errors", errors=errors)
+        return
     ack()
     backblast_data = _parse_backblast_body(body, logger)
     now = time.time()
@@ -537,7 +558,6 @@ handler = SlackRequestHandler(app)
 
 def slackbot(request):
     if request.method == "GET" and request.path.endswith("/healthz"):
-        print("health check")
         return make_response(f'{{"status": "alive", "path": "{request.path}"}}', 200)
     return handler.handle(request)
 

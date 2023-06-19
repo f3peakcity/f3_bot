@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+sqlalchemy = "*"
+psycopg2-binary = "*"
+sqlalchemy-cockroachdb = "*"
+jupyter = "*"
+great_expectations = "==0.16.15"
+
+# Note: great-expectations was *manually* installed with pip:
+# pip install -e git+https://github.com/great-expectations/great_expectations.git@develop#egg=great_expectations --config-settings editable_mode=compat
+# Note the use of compat mode to ensure that vscode can analyze it (for autocomplete)
+[dev-packages]
+pika = "*"
+
+[requires]
+python_version = "3.9"
+python_full_version = "3.9.16"

@@ -82,6 +82,6 @@ jobs:
         entry_point: slackbot
         runtime: python39
         region: us-east1
-        source_dir: ./slackbot/
+        source_dir: ./slackbot/slackbot
         env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
         env_vars_file: ${{ inputs.env_vars_file }}
