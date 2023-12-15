@@ -30,4 +30,6 @@ update backblast set ao_id='C04GDN8BS6P', team_id='T046M8F12U8' where ao='ao-sat
 
 update backblast set ao_id='C04GDN8BS6P', team_id='T046M8F12U8',  where ao='ao-sat-dasboot' AND date >= '2023-01-01';
 
+update backblast set ao='ao-tue-ruck-this-way' where ao_id='C050K0D6GL8';
 
+update backblast set ao='ao-tue-raiders' where ao_id='C062LFRRJMR';
