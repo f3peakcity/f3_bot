@@ -15,7 +15,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Warmup Slackbot
         run: |
-          curl -q https://us-east1-f3-carpex.cloudfunctions.net/slackbot/healthz
           curl -q https://us-east1-f3-carpex.cloudfunctions.net/slackbot-peakcity/healthz
           curl -q https://us-east1-f3-carpex.cloudfunctions.net/slackbot-greenlevel/healthz
           curl -q https://us-east1-f3-carpex.cloudfunctions.net/slackbot-churham/healthz
