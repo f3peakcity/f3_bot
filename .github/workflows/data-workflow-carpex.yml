@@ -1,4 +1,4 @@
-name: Data Workflow - Carpex
+name: Data Workflow
 
 on:
   schedule:
