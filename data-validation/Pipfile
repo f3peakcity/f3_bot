@@ -4,11 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-sqlalchemy = "*"
-psycopg2-binary = "*"
-sqlalchemy-cockroachdb = "*"
-jupyter = "*"
-great_expectations = "==0.17.0"
+sqlalchemy = "2.0.15"
+psycopg2-binary = "2.9.6"
+sqlalchemy-cockroachdb = "==2.0.1"
+great_expectations = "==0.18.8"
 
 # Note: great-expectations was *manually* installed with pip:
 # pip install -e git+https://github.com/great-expectations/great_expectations.git@develop#egg=great_expectations --config-settings editable_mode=compat
@@ -16,7 +15,7 @@ great_expectations = "==0.17.0"
 
 [dev-packages]
 pika = "*"
+jupyter = "*"
 
 [requires]
 python_version = "3.9"
-python_full_version = "3.9.16"

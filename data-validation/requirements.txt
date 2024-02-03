@@ -1,4 +1,4 @@
 sqlalchemy==2.0.15
 psycopg2-binary==2.9.6
 sqlalchemy-cockroachdb==2.0.1
-great-expectations==0.17.14
+great-expectations==0.18.8
