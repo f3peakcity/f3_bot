@@ -10,11 +10,10 @@ on:
 jobs:
   warmup_slackbot:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - name: Warmup Slackbot
         run: |
-          curl -q https://us-east1-f3-carpex.cloudfunctions.net/slackbot-peakcity/healthz
-          curl -q https://us-east1-f3-carpex.cloudfunctions.net/slackbot-greenlevel/healthz
-          curl -q https://us-east1-f3-carpex.cloudfunctions.net/slackbot-churham/healthz
+          curl -sq https://us-east1-f3-carpex.cloudfunctions.net/slackbot-peakcity/healthz
+          curl -sq https://us-east1-f3-carpex.cloudfunctions.net/slackbot-greenlevel/healthz
+          curl -sq https://us-east1-f3-carpex.cloudfunctions.net/slackbot-churham/healthz
