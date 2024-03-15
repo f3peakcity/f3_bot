@@ -11,7 +11,7 @@ jobs:
   warmup_slackbot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Warmup Slackbot
         run: |
           curl -sq https://us-east1-f3-carpex.cloudfunctions.net/slackbot-peakcity/healthz
