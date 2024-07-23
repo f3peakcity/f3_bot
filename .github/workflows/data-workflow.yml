@@ -5,7 +5,6 @@ on:
     - cron: "23 19 * * *"
   workflow_dispatch:
 
-
 jobs:
   data_workflow:
     runs-on: ubuntu-latest
@@ -22,12 +21,12 @@ jobs:
           python-version: 3.9
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r data-workflow/requirements.txt
+          python -m pip install pipenv --user
+          pipenv install
       - name: Run Workflow
         run: |
-          python data-workflow/main.py
-  
+          pipenv run python data-workflow/main.py
+
   data_validation:
     needs: data_workflow
     runs-on: ubuntu-latest
