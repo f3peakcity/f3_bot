@@ -50,5 +50,5 @@ jobs:
         working-directory: ./data-validation
       - name: Run Workflow
         run: |
-            pipenv run python main.py
+          pipenv run python main.py
         working-directory: ./data-validation
