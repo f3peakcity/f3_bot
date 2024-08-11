@@ -50,6 +50,7 @@ jobs:
       uses: google-github-actions/deploy-cloud-functions@main
       with:
         name: ${{ inputs.queue_handler_name }}
+        environment: GEN_1
         entry_point: f3_sheets_handler
         runtime: python39
         region: us-east1
@@ -83,6 +84,7 @@ jobs:
       uses: google-github-actions/deploy-cloud-functions@main
       with:
         name: ${{ inputs.slackbot_name }}
+        environment: GEN_1
         entry_point: slackbot
         runtime: python39
         region: us-east1
