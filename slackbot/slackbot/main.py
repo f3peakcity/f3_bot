@@ -165,6 +165,15 @@ def open_backblast_form(ack, client, command, logger):
                         "element": {
                             "type": "plain_text_input",
                             "multiline": True,
+                            "initial_value": """
+WARMUP:
+
+THE THANG:
+
+MARY:
+
+ANNOUNCEMENTS / COT:
+"""
                             "placeholder": {
                                 "type": "plain_text",
                                 "text": "Workout summary"
@@ -173,7 +182,7 @@ def open_backblast_form(ack, client, command, logger):
                         },
                         "label": {
                             "type": "plain_text",
-                            "text": "Summary",
+                            "text": "Workout Summary",
                             "emoji": True
                         },
                         "optional": True
