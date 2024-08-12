@@ -18,7 +18,6 @@ on:
     secrets:
       SLACKBOT_ENV_VARS:
         required: true
-  workflow_dispatch:
 
 jobs:
   deploy-queue-handler:

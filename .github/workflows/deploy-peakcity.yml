@@ -3,7 +3,8 @@ name: Deploy Peak City
 on:
   push:
     branches:
-    - main
+      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -14,4 +15,4 @@ jobs:
       queue_handler_name: f3-sheets-handler-peakcity
       env_vars_file: ./env/env-peakcity.yml
     secrets:
-      SLACKBOT_ENV_VARS: '${{ secrets.SLACKBOT_ENV_VARS }}'
+      SLACKBOT_ENV_VARS: "${{ secrets.SLACKBOT_ENV_VARS }}"
