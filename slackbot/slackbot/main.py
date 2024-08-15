@@ -173,7 +173,7 @@ THE THANG:
 MARY:
 
 ANNOUNCEMENTS / COT:
-"""
+""",
                             "placeholder": {
                                 "type": "plain_text",
                                 "text": "Workout summary"
