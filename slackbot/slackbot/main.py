@@ -165,15 +165,14 @@ def open_backblast_form(ack, client, command, logger):
                         "element": {
                             "type": "plain_text_input",
                             "multiline": True,
-                            "initial_value": """
-WARMUP:
+                            "initial_value": """WARMUP:
 
 THE THANG:
 
 MARY:
 
 ANNOUNCEMENTS / COT:
-"""
+""",
                             "placeholder": {
                                 "type": "plain_text",
                                 "text": "Workout summary"
