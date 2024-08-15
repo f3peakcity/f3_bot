@@ -18,7 +18,6 @@ on:
     secrets:
       SLACKBOT_ENV_VARS:
         required: true
-  workflow_dispatch:
 
 jobs:
   deploy-queue-handler:
@@ -26,70 +25,67 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     permissions:
-      contents: 'read'
-      id-token: 'write'
-  
+      contents: "read"
+      id-token: "write"
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - id: 'auth'
-      name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v1'
-      with:
-        workload_identity_provider: 'projects/330812298791/locations/global/workloadIdentityPools/github/providers/github'
-        service_account: 'github-action-runner@f3-carpex.iam.gserviceaccount.com'
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          workload_identity_provider: "projects/330812298791/locations/global/workloadIdentityPools/github/providers/github"
+          service_account: "github-action-runner@f3-carpex.iam.gserviceaccount.com"
 
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v0'
-    
-    - name: Add cockroachdb cert to src folder
-      run: |
-        cp ./root.crt ./sheets_task/src/root.crt
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v0"
 
-    - name: Deploy Queue Handler
-      uses: google-github-actions/deploy-cloud-functions@main
-      with:
-        name: ${{ inputs.queue_handler_name }}
-        environment: GEN_1
-        entry_point: f3_sheets_handler
-        runtime: python39
-        region: us-east1
-        source_dir: ./sheets_task/src
-        env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
-        env_vars_file: ${{ inputs.env_vars_file }}
+      - name: Add cockroachdb cert to src folder
+        run: |
+          cp ./root.crt ./sheets_task/src/root.crt
+
+      - name: Deploy Queue Handler
+        uses: google-github-actions/deploy-cloud-functions@v2
+        with:
+          name: ${{ inputs.queue_handler_name }}
+          entry_point: f3_sheets_handler
+          runtime: python39
+          region: us-east1
+          source_dir: ./sheets_task/src
+          env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
+          env_vars_file: ${{ inputs.env_vars_file }}
 
   deploy-slackbot:
     name: Deploy Slackbot
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - id: 'auth'
-      name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v1'
-      with:
-        workload_identity_provider: 'projects/330812298791/locations/global/workloadIdentityPools/github/providers/github'
-        service_account: 'github-action-runner@f3-carpex.iam.gserviceaccount.com'
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          workload_identity_provider: "projects/330812298791/locations/global/workloadIdentityPools/github/providers/github"
+          service_account: "github-action-runner@f3-carpex.iam.gserviceaccount.com"
 
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v0'
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v0"
 
-    - name: Deploy Slackbot
-      uses: google-github-actions/deploy-cloud-functions@main
-      with:
-        name: ${{ inputs.slackbot_name }}
-        environment: GEN_1
-        entry_point: slackbot
-        memory_mb: 256
-        runtime: python39
-        region: us-east1
-        source_dir: ./slackbot/slackbot
-        env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
-        env_vars_file: ${{ inputs.env_vars_file }}
+      - name: Deploy Slackbot
+        uses: google-github-actions/deploy-cloud-functions@v2
+        with:
+          name: ${{ inputs.slackbot_name }}
+          entry_point: slackbot
+          runtime: python39
+          region: us-east1
+          source_dir: ./slackbot/slackbot
+          env_vars: ${{ secrets.SLACKBOT_ENV_VARS }}
+          env_vars_file: ${{ inputs.env_vars_file }}
