@@ -56,7 +56,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install --without dev --sync
+          poetry install --sync
 
       - name: Run Workflow
         run: |
