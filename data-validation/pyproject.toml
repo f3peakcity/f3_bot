@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "data-validation"
+version = "0.1.0"
+description = ""
+authors = ["F3 <info@baserate.org>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+great-expectations = {version = "1.2.6", extras = ["cloud", "postgresql"]}
+sqlalchemy-cockroachdb = "2.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+notebook = "^7.3.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
