@@ -52,13 +52,14 @@ jobs:
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: '1.8.4'
+          poetry-version: "1.8.4"
 
       - name: Install dependencies
         run: |
           poetry install --sync
+        working-directory: ./data-validation
 
       - name: Run Workflow
         run: |
-          pipenv run python main.py
+          poetry run python main.py
         working-directory: ./data-validation

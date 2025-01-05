@@ -1,9 +1,7 @@
 [tool.poetry]
 name = "data-validation"
-version = "0.1.0"
-description = ""
 authors = ["F3 <info@baserate.org>"]
-readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
